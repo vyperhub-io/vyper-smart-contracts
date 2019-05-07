@@ -1,2 +1,2 @@
-# smart-contracts
-All smart contracts listed at vyperhub.io
+# vyper-smart-contracts
+All smart contracts used at vyperhub.io
