@@ -27,13 +27,13 @@ Approval: event({_owner: indexed(address), _spender: indexed(address), _value: u
 # Returns the name of the token - e.g. "MyToken".
 # OPTIONAL - This method can be used to improve usability, but interfaces and
 #            other contracts MUST NOT expect these values to be present.
-name: public(string[32]) # TODO: is this an acceptable size?
+name: public(string[64]) # TODO: is this an acceptable size?
 
 # ----- symbol -----
 # Returns the symbol of the token. E.g. "HIX".
 # OPTIONAL - This method can be used to improve usability, but interfaces and
 #            other contracts MUST NOT expect these values to be present.
-symbol: public(string[16]) # TODO: is this an acceptable size?
+symbol: public(string[32]) # TODO: is this an acceptable size?
 
 # ----- decimals -----
 # Returns the number of decimals the token uses - e.g. 8, means to divide
