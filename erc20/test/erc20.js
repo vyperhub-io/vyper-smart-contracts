@@ -30,85 +30,50 @@ contract("ERC20", async accounts => {
   });
 
   // TODO: expected <BN: 52b7d2dcc80cd2e4000000> to equal 100000000
-  it(`...should set totalSupply to ${args.totalSupply}.`, async () => {
+  it(`...should set totalSupply to ${args.totalSupply * 10 ** args.decimals}.`, async () => {
     const erc20Token = await erc20.deployed({...args});
     // get token totalSupply
-    const erc20_totalSupply = await erc20Token.totalSupply();
-    assert.equal(erc20_totalSupply, args.totalSupply, "The tokens totalSupply were not correctly set.");
+    let erc20_totalSupply = await erc20Token.totalSupply();
+    erc20_totalSupply = erc20_totalSupply.toString();
+    const actual_totalSupply = args.totalSupply * 10 ** args.decimals;
+    assert.equal(erc20_totalSupply, actual_totalSupply, "The tokens totalSupply were not correctly set.");
   });
 
-  it(`...should transfer tokens.`, async () => {
-    const account_one = accounts[0];
-    const account_two = accounts[1];
+  it("...should transfer tokens.", async () => {
+    const sender = accounts[0];
+    const receiver = accounts[1];
 
     const amount = 100;
 
-    const erc20Token = await erc20.deployed();
+    const erc20Token = await erc20.deployed({...args});
 
-    let balance = await erc20Token.balanceOf.call(account_one);
+    let balance = await erc20Token.balanceOf.call(sender);
+    const sender_starting_balance = balance.toString();
 
-    const account_one_starting_balance = balance.toNumber();
+    balance = await erc20Token.balanceOf.call(receiver);
+    const receiver_starting_balance = balance.toString();
 
-    balance = await erc20Token.balanceOf.call(account_two);
-    const account_two_starting_balance = balance.toNumber();
-    await erc20Token.transfer(account_two, amount, { from: account_one });
+    await erc20Token.transfer(receiver, amount, { from: sender });
 
-    balance = await erc20Token.balanceOf.call(account_one);
-    const account_one_ending_balance = balance.toNumber();
+    balance = await erc20Token.balanceOf.call(sender);
+    const sender_ending_balance = balance.toString();
 
-    balance = await erc20Token.balanceOf.call(account_two);
-    const account_two_ending_balance = balance.toNumber();
+    balance = await erc20Token.balanceOf.call(receiver);
+    const receiver_ending_balance = balance.toString();
 
     assert.equal(
-      account_one_ending_balance,
-      account_one_starting_balance - amount,
+      sender_ending_balance,
+      sender_starting_balance - amount,
       "Amount wasn't correctly taken from the sender"
     );
     assert.equal(
-      account_two_ending_balance,
-      account_two_starting_balance + amount,
+      receiver_ending_balance - amount,
+      receiver_starting_balance,
       "Amount wasn't correctly sent to the receiver"
     );
   });
 
-  it(`...should transferFrom tokens.`, async () => {
-    const account_one = accounts[0];
-    const account_two = accounts[1];
-
-    const amount = 100;
-
-    const erc20Token = await erc20.deployed();
-
-    let balance = await erc20Token.balanceOf.call(account_one);
-
-    const account_one_starting_balance = balance.toNumber();
-
-    balance = await erc20Token.balanceOf.call(account_two);
-    const account_two_starting_balance = balance.toNumber();
-    await erc20Token.transferFrom(account_one, account_two, amount, { from: account_one });
-
-    balance = await erc20Token.balanceOf.call(account_one);
-    const account_one_ending_balance = balance.toNumber();
-
-    balance = await erc20Token.balanceOf.call(account_two);
-    const account_two_ending_balance = balance.toNumber();
-
-    assert.equal(
-      account_one_ending_balance,
-      account_one_starting_balance - amount,
-      "Amount wasn't correctly transfered from the sender"
-    );
-    assert.equal(
-      account_two_ending_balance,
-      account_two_starting_balance + amount,
-      "Amount wasn't correctly transfered to the receiver"
-    );
-  });
-
-  // TODO: this test is not working
-  //       the vyper functions are working as expected
-  //       but here erc20Token.approve.call is not working...
-  it(`...should approve account.`, async () => {
+  it("...should approve amount.", async () => {
     const owner = accounts[0];
     const spender = accounts[1];
 
@@ -117,19 +82,65 @@ contract("ERC20", async accounts => {
 
     // get allowance before 'approve'
     let allowance = await erc20Token.allowance.call(owner, spender);
-    const spender_allowance_before = allowance.toNumber();
+    const spender_allowance_before = allowance.toString();
 
     // approve 'amount'
-    await erc20Token.approve.call(spender, amount, { from: owner });
+    await erc20Token.approve(spender, amount, { from: owner });
 
     // get allowance after 'approve'
     allowance = await erc20Token.allowance.call(owner, spender);
-    const spender_allowance_after = allowance.toNumber();
+    const spender_allowance_after = allowance.toString();
 
     assert.equal(
       spender_allowance_before,
       spender_allowance_after - amount,
       "Amount wasn't correctly approved"
+    );
+  });
+
+  it("...should transferFrom tokens.", async () => {
+    const owner = accounts[0];
+    const sender = accounts[1];
+
+    const amount = 100;
+
+    const erc20Token = await erc20.deployed({...args});
+
+    allowance = await erc20Token.allowance.call(owner, sender);
+    const sender_starting_allowance = allowance.toString();
+
+    let balance = await erc20Token.balanceOf.call(sender);
+    const sender_starting_balance = balance.toString();
+
+    balance = await erc20Token.balanceOf.call(owner);
+    const owner_starting_balance = balance.toString();
+
+    // 'sender/operator' transfers tokens of 'owner' to himself
+    await erc20Token.transferFrom(owner, sender, amount, { from: sender });
+
+    balance = await erc20Token.balanceOf.call(sender);
+    const sender_ending_balance = balance.toString();
+
+    balance = await erc20Token.balanceOf.call(owner);
+    const owner_ending_balance = balance.toString();
+
+    allowance = await erc20Token.allowance.call(owner, sender);
+    const sender_ending_allowance = allowance.toString();
+
+    assert.equal(
+      owner_starting_balance - amount,
+      owner_ending_balance,
+      "Amount wasn't correctly transfered from the owner"
+    );
+    assert.equal(
+      sender_starting_balance,
+      sender_ending_balance - amount,
+      "Amount wasn't correctly transfered to the sender"
+    );
+    assert.equal(
+      sender_starting_allowance - amount,
+      sender_ending_allowance,
+      "Allowance of sender wasn't correctly updated"
     );
   });
 
