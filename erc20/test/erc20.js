@@ -69,7 +69,6 @@ contract("ERC20", async accounts => {
       account_two_starting_balance + amount,
       "Amount wasn't correctly sent to the receiver"
     );
-
   });
 
   it(`...should transferFrom tokens.`, async () => {
@@ -104,6 +103,34 @@ contract("ERC20", async accounts => {
       account_two_starting_balance + amount,
       "Amount wasn't correctly transfered to the receiver"
     );
-
   });
+
+  // TODO: this test is not working
+  //       the vyper functions are working as expected
+  //       but here erc20Token.approve.call is not working...
+  it(`...should approve account.`, async () => {
+    const owner = accounts[0];
+    const spender = accounts[1];
+
+    const amount = 100;
+    const erc20Token = await erc20.deployed();
+
+    // get allowance before 'approve'
+    let allowance = await erc20Token.allowance.call(owner, spender);
+    const spender_allowance_before = allowance.toNumber();
+
+    // approve 'amount'
+    await erc20Token.approve.call(spender, amount, { from: owner });
+
+    // get allowance after 'approve'
+    allowance = await erc20Token.allowance.call(owner, spender);
+    const spender_allowance_after = allowance.toNumber();
+
+    assert.equal(
+      spender_allowance_before,
+      spender_allowance_after - amount,
+      "Amount wasn't correctly approved"
+    );
+  });
+
 });
