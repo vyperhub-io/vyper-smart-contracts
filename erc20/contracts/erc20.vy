@@ -52,7 +52,7 @@ approvedFunds: map(address, map(address, uint256))
 
 
 @public
-def __init__(_name: string[32], _symbol: string[16], _decimals: uint256, _totalSupply: uint256):
+def __init__(_name: string[64], _symbol: string[32], _decimals: uint256, _totalSupply: uint256):
     self.name = _name
     self.symbol = _symbol
     self.decimals = _decimals
