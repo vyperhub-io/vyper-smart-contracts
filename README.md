@@ -1,5 +1,5 @@
 # vyper-smart-contracts
-All smart contracts used at [vyperhub.io](http://vyperhub.io/)
+All smart contracts listed at [vyperhub.io](http://vyperhub.io/)
 
 ## Overview
 
