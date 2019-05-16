@@ -13,7 +13,7 @@ An example problem is defined in the contracts `_calculateNewSolution(_x1: uint2
   return (3 * _x1) + (2 * _x2)
 ```
 
-### Example problem
+### Problem
 
 1) Ahh Ethereum related work - what a bliss! But on any given day, after a maximum of 8 hours, the FOMO just gets to real. You need to skratch that itch and check out those totally healthy/objective/productive/non toxic Twitter discussions.
 
@@ -25,8 +25,9 @@ An example problem is defined in the contracts `_calculateNewSolution(_x1: uint2
 
 5) Prediction markets show that working on Ethereum related stuff gives you +3 of whatever it is you need but Twitter discussions only +2. 100 of that stuff is enough though.
 
-x1 = hours working on Ethereum related stuff
-x2 = hours engaging in the latest blockchain Twitter discussions
+`x1 = # hours working on Ethereum related stuff`
+
+`x2 = # hours engaging in the latest blockchain related Twitter discussions`
 
 ### How it works
 
