@@ -18,3 +18,8 @@ An example problem is defined in the contracts `_calculateNewSolution(_x1: uint2
 Users can submit solutions using the `submitSolution(_x1: uint256, _x2: uint256)` method.
 The contract checks the submitted values against the problems constraints and saves/rejects them depending on whether the solution respects all of them.
 When the end of the competition is reached, the address that submitted the best solution can call `claimBounty()` to claim the Ether that is locked in the contract.
+
+## Run tests
+```bash
+$ truffle test --network ganache
+```
