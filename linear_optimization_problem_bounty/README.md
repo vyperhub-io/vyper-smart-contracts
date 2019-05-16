@@ -13,22 +13,6 @@ An example problem is defined in the contracts `_calculateNewSolution(_x1: uint2
   return (3 * _x1) + (2 * _x2)
 ```
 
-### Problem
-
-1) Ahh Ethereum related work - what a bliss! But on any given day, after a maximum of 8 hours, the FOMO just gets to real. You need to skratch that itch and check out those totally healthy/objective/productive/non toxic Twitter discussions.
-
-2) Voicing your opinion on whether Ether is money or if that blockchain with less than 500 monthly transactions is sufficiently decentralized is great! But you only need to skratch that itch for 12 hours each day - or less.
-
-3) Work life balance - lol! You are litteraly building the future here! Shame you only get 24 hours each day! And you're going to use all of them. Hey, maybe blockchain with just the right amount of basic game theory could help solve that problem!
-
-4) Einstein said that going back in time is not possible. Lol guy prob didn't own a Delorean. But once that totally undervalued coin you FOMO'ed into last year gets the attention it deserves you will.
-
-5) Prediction markets show that working on Ethereum related stuff gives you +3 of whatever it is you need but Twitter discussions only +2. 100 of that stuff is enough though.
-
-`x1 = # hours working on Ethereum related stuff`
-
-`x2 = # hours engaging in the latest blockchain related Twitter discussions`
-
 ### How it works
 
 Users can submit solutions using the `submitSolution(_x1: uint256, _x2: uint256)` method.
