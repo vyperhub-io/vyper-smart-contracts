@@ -10,4 +10,5 @@ This makes it easy to quickly compile and test them locally.
 | - | - | - |
 | [ERC20](erc20/) | [Link](erc20/contracts/erc20.vy) | [Link](erc20/tests/erc20.js) |
 | [ERC721](erc721/) | [Link](erc721/contracts/erc721.vy) | [Link](erc721/tests/erc721.js) |
+| [linear_optimization_problem_bounty](linear_optimization_problem_bounty/) | [Link](linear_optimization_problem_bounty/contracts/linear_optimization_problem_bounty.vy) | [Link](linear_optimization_problem_bounty/tests/linear_optimization_problem_bounty.js) |
 | [vyperStorage](erc20/) | [Link](vyperStorage/contracts/VyperStorage.vy) | [Link](vyperStorage/tests/vyperStorage.js) |
