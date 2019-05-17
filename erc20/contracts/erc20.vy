@@ -1,7 +1,9 @@
-# ERC20 Token Standard (https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md)
-
 # Author: Sören Steiger, github.com/ssteiger
 # License: MIT
+
+# ERC20 Token Standard 
+# https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
+
 
 from vyper.interfaces import ERC20
 
