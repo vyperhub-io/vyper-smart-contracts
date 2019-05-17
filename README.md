@@ -1,5 +1,5 @@
 # Vyper Contracts
-All smart contracts listed at [vyperhub.io](http://vyperhub.io/)
+All smart contracts listed at [vyperhub.io](https://vyperhub.io/)
 
 Each contract in this repository is wrapped inside its own [truffle](https://truffleframework.com/) project.
 This makes it easy to quickly compile and test them locally.
