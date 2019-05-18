@@ -12,3 +12,5 @@ This makes it easy to quickly compile and test them locally.
 | [ERC721](erc721/) | [Link](erc721/contracts/erc721.vy) | [Link](erc721/tests/erc721.js) |
 | [Linear optimization problem bounty](linear_optimization_problem_bounty/) | [Link](linear_optimization_problem_bounty/contracts/linear_optimization_problem_bounty.vy) | [Link](linear_optimization_problem_bounty/tests/linear_optimization_problem_bounty.js) |
 | [vyperStorage](erc20/) | [Link](vyperStorage/contracts/VyperStorage.vy) | [Link](vyperStorage/tests/vyperStorage.js) |
+
+**Disclaimer:** All contracts in this repository as well as contracts hosted at [vyperhub.io](https://vyperhub.io/) are in beta and should not be used in production!
