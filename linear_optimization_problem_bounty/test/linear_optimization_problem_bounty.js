@@ -69,9 +69,10 @@ contract("linear_optimization_problem_bounty", async accounts => {
       x2,
       "x2 value wasn't correctly set."
     );
+    // NOTE: update this if the problem in the contract is changed
     assert.equal(
       instance_bestSolution,
-      (3 * x1) + (2 * x2),
+      (4 * x1) + (6 * x2),
       "BestSolution value wasn't correctly set."
     );
     assert.equal(
