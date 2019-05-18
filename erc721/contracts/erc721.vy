@@ -127,7 +127,6 @@ def _setNewOwner(_currentOwner: address, _newOwner: address, _tokenId: uint256):
     self.nftCount[_currentOwner] -= 1
     self.nftCount[_newOwner] += 1
     # reset operator
-    # TODO: what about `approvedForAll`?
     self.operatorFor[_tokenId] = ZERO_ADDRESS
 
 
