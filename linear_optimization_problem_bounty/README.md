@@ -4,13 +4,13 @@ This contract implements a bounty for solving linear optimization problems.
 An example problem is defined in the contracts `_calculateNewSolution(_x1: uint256, _x2: uint256)` method:
 
 ```python
-  assert _x1 <= 8
-  assert _x2 <= 12
-  assert (3 * _x1) + (2 * _x2) <= 100
-  assert _x1 + _x2 <= 24
-  assert _x1 > 0 and _x2 > 0
+  assert x1 <= 40
+  assert x2 <= 35
+  assert (3 * x1) + (2 * x2) <= 200
+  assert x1 + x2 <= 120
+  assert x1 > 0 and x2 > 0
   # calculate and return new solution
-  return (3 * _x1) + (2 * _x2)
+  return (4 * x1) + (6 * x2)
 ```
 
 ### How it works

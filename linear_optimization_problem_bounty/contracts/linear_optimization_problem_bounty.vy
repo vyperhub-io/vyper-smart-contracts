@@ -45,13 +45,13 @@ def __default__():
 @private
 def _calculateNewSolution(_x1: uint256, _x2: uint256) -> uint256:
     # check new parameters against constraints
-    assert _x1 <= 8
-    assert _x2 <= 12
-    assert (3 * _x1) + (2 * _x2) <= 100
-    assert _x1 + _x2 <= 24
+    assert _x1 <= 40
+    assert _x2 <= 35
+    assert (3 * _x1) + (2 * _x2) <= 200
+    assert _x1 + _x2 <= 120
     assert _x1 > 0 and _x2 > 0
     # calculate and return new solution
-    return (3 * _x1) + (2 * _x2)
+    return (4 * _x1) + (6 * _x2)
 
 
 @public
