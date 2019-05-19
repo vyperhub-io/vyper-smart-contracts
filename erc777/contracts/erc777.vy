@@ -69,7 +69,7 @@ symbol: public(string[32])
 totalSupply: public(uint256)
 granularity: public(uint256)
 
-tokenBalanceOf: map(address, uint256)
+balanceOf: map(address, uint256)
 
 defaultOperators: map(address, bool)
 operators: map(address, map(address, bool))
@@ -90,8 +90,8 @@ def __init__(
     #       address and the implementer and the keccak256 hash of
     #       ERC777Token (0xac7fbab5f54a3ca8194167523c6753bfeb96a445279294b6125b68cce2177054)
     #       as the interface hash.
-    # TODO: also register ERC777TokensSender
-    # TODO: also register ER777TokenRecipient
+    # TODO: also register ERC777TokensSender (0x29ddb589b1fb5fc7cf394961c1adf5f8c6454761adf795e67fe149f658abe895)
+    # TODO: also register ER777TokenRecipient (0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b)
     self.name = _name
     self.symbol = _symbol
     self.totalSupply = _totalSupply * 10 ** _granularity
@@ -142,19 +142,12 @@ def _transferFunds(
     assert _amount % self.granularity == 0
     if _from.is_contract:
         self._checkForERC777TokensInterface_Sender(_operator, _from, _to, _amount, _data, _operatorData)
-    self.tokenBalanceOf[_from] -= _amount
-    self.tokenBalanceOf[_to] += _amount
+    self.balanceOf[_from] -= _amount
+    self.balanceOf[_to] += _amount
     # only check for `tokensReceived` hook if transfer is not a burn
     if _to != ZERO_ADDRESS:
         if _to.is_contract:
             self._checkForERC777TokensInterface_Recipient(_operator, _from, _to, _amount, _data, _operatorData)
-
-
-@public
-@constant
-def balanceOf(_holder: address) -> uint256:
-    return self.tokenBalanceOf[_holder]
-
 
 @public
 @constant
@@ -235,7 +228,7 @@ def mint(
     assert _to != ZERO_ADDRESS
     # only operators are allowed to mint
     assert self.defaultOperators[msg.sender]
-    self.tokenBalanceOf[_to] += _amount
+    self.balanceOf[_to] += _amount
     self.totalSupply += _amount
     if _to.is_contract:
         self._checkForERC777TokensInterface_Recipient(_operator, ZERO_ADDRESS, _to, _amount, data, _operatorData)
