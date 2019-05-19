@@ -5,6 +5,18 @@
 
 # NOTICE: This contract is a work-in-progress and should not be used in production!
 
+# Interface for ERC1820 registry contract (http://eips.ethereum.org/EIPS/eip-1820)
+contract ERC1820Registry:
+    def setInterfaceImplementer(
+        _addr: address,
+        _interfaceHash: bytes32,
+        _implementer: address,
+    ): modifying
+    def getInterfaceImplementer(
+        _addr: address,
+        _interfaceHash: bytes32,
+    ): modifying
+
 # Interface for ERC777Tokens sender contracts
 contract ERC777TokensSender:
     def tokensToSend(
@@ -14,7 +26,7 @@ contract ERC777TokensSender:
         _amount: uint256,
         _data: bytes[256],
         _operatorData: bytes[256]
-    ) -> bytes32: constant
+    ): modifying
 
 # Interface for ERC777Tokens recipient contracts
 contract ERC777TokensRecipient:
@@ -25,7 +37,7 @@ contract ERC777TokensRecipient:
         _amount: uint256,
         _data: bytes[256],
         _operatorData: bytes[256]
-    ) -> bytes32: constant
+    ): modifying
 
 
 Sent: event({
@@ -74,6 +86,8 @@ balanceOf: map(address, uint256)
 defaultOperators: map(address, bool)
 operators: map(address, map(address, bool))
 
+ERC1820Registry_address: constant(address) = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
+
 
 @public
 def __init__(
@@ -83,15 +97,6 @@ def __init__(
     _granularity: uint256,
     _defaultOperators: address[4]
   ):
-    # TODO: The token contract MUST register the ERC777Token interface
-    #       with its own address via ERC1820.
-    #       This is done by calling the setInterfaceImplementer function on
-    #       the ERC1820 registry with the token contract address as both the
-    #       address and the implementer and the keccak256 hash of
-    #       ERC777Token (0xac7fbab5f54a3ca8194167523c6753bfeb96a445279294b6125b68cce2177054)
-    #       as the interface hash.
-    # TODO: also register ERC777TokensSender (0x29ddb589b1fb5fc7cf394961c1adf5f8c6454761adf795e67fe149f658abe895)
-    # TODO: also register ER777TokenRecipient (0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b)
     self.name = _name
     self.symbol = _symbol
     self.totalSupply = _totalSupply * 10 ** _granularity
@@ -99,6 +104,8 @@ def __init__(
     for i in range(4):
         if _defaultOperators[i] != ZERO_ADDRESS:
             self.defaultOperators[_defaultOperators[i]] = True
+    # TODO: this is not working
+    ERC1820Registry(self.ERC1820Registry_address).setInterfaceImplementer(self, keccak256('ERC777Token'), self)
 
 
 @private
@@ -111,8 +118,9 @@ def _checkForERC777TokensInterface_Sender(
     _data: bytes[256]="",
     _operatorData: bytes[256]=""
   ):
-    returnValue: bytes32 = ERC777TokensSender(_from).tokensToSend(_operator, _from, _to, _amount, _data, _operatorData)
-    assert returnValue == method_id("tokensToSend(address,address,address,uint256,bytes,bytes)", bytes32)
+    implementer: address = ERC1820Registry(self.ERC1820Registry_address).getInterfaceImplementer(_from, keccak256('ERC777TokensSender'))
+    if implementer != ZERO_ADDRESS:
+        ERC777TokensSender(_from).tokensToSend(_operator, _from, _to, _amount, _data, _operatorData)
 
 
 @private
@@ -125,8 +133,9 @@ def _checkForERC777TokensInterface_Recipient(
     _data: bytes[256]="",
     _operatorData: bytes[256]=""
   ):
-    returnValue: bytes32 = ERC777TokensRecipient(_to).tokensReceived(_operator, _from, _to, _amount, _data, _operatorData)
-    assert returnValue == method_id("tokensReceived(address,address,address,uint256,bytes,bytes)", bytes32)
+    implementer: address = ERC1820Registry.getInterfaceImplementer(_from, keccak256('ER777TokenRecipient'))
+    if implementer != ZERO_ADDRESS:
+        ERC777TokensRecipient(_to).tokensReceived(_operator, _from, _to, _amount, _data, _operatorData)
 
 
 @private
