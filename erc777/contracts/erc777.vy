@@ -15,7 +15,7 @@ contract ERC1820Registry:
     def getInterfaceImplementer(
         _addr: address,
         _interfaceHash: bytes32,
-    ): modifying
+    ) -> address: modifying
 
 # Interface for ERC777Tokens sender contracts
 contract ERC777TokensSender:
@@ -86,8 +86,7 @@ balanceOf: map(address, uint256)
 defaultOperators: map(address, bool)
 operators: map(address, map(address, bool))
 
-ERC1820Registry_address: constant(address) = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
-
+erc1820Registry: ERC1820Registry
 
 @public
 def __init__(
@@ -104,8 +103,8 @@ def __init__(
     for i in range(4):
         if _defaultOperators[i] != ZERO_ADDRESS:
             self.defaultOperators[_defaultOperators[i]] = True
-    # TODO: this is not working
-    ERC1820Registry(self.ERC1820Registry_address).setInterfaceImplementer(self, keccak256('ERC777Token'), self)
+    self.erc1820Registry = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
+    self.erc1820Registry.setInterfaceImplementer(self, keccak256('ERC777Token'), self)
 
 
 @private
@@ -118,7 +117,7 @@ def _checkForERC777TokensInterface_Sender(
     _data: bytes[256]="",
     _operatorData: bytes[256]=""
   ):
-    implementer: address = ERC1820Registry(self.ERC1820Registry_address).getInterfaceImplementer(_from, keccak256('ERC777TokensSender'))
+    implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256('ERC777TokensSender'))
     if implementer != ZERO_ADDRESS:
         ERC777TokensSender(_from).tokensToSend(_operator, _from, _to, _amount, _data, _operatorData)
 
@@ -133,7 +132,7 @@ def _checkForERC777TokensInterface_Recipient(
     _data: bytes[256]="",
     _operatorData: bytes[256]=""
   ):
-    implementer: address = ERC1820Registry.getInterfaceImplementer(_from, keccak256('ER777TokenRecipient'))
+    implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256('ER777TokenRecipient'))
     if implementer != ZERO_ADDRESS:
         ERC777TokensRecipient(_to).tokensReceived(_operator, _from, _to, _amount, _data, _operatorData)
 
@@ -157,6 +156,7 @@ def _transferFunds(
     if _to != ZERO_ADDRESS:
         if _to.is_contract:
             self._checkForERC777TokensInterface_Recipient(_operator, _from, _to, _amount, _data, _operatorData)
+
 
 @public
 @constant
