@@ -86,6 +86,7 @@ balanceOf: map(address, uint256)
 defaultOperators: map(address, bool)
 operators: map(address, map(address, bool))
 
+erc1820Registry_Address: constant(address) = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
 erc1820Registry: ERC1820Registry
 
 @public
@@ -103,7 +104,7 @@ def __init__(
     for i in range(4):
         if _defaultOperators[i] != ZERO_ADDRESS:
             self.defaultOperators[_defaultOperators[i]] = True
-    self.erc1820Registry = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
+    self.erc1820Registry = ERC1820Registry(erc1820Registry_Address)
     self.erc1820Registry.setInterfaceImplementer(self, keccak256('ERC777Token'), self)
 
 
