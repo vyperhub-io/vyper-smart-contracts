@@ -3,7 +3,6 @@
 
 # ERC777 Token Standard (https://eips.ethereum.org/EIPS/eip-777)
 
-# NOTICE: This contract is a work-in-progress and should not be used in production!
 
 # Interface for ERC1820 registry contract (http://eips.ethereum.org/EIPS/eip-1820)
 contract ERC1820Registry:
@@ -76,6 +75,9 @@ RevokedOperator: event({
 })
 
 
+erc1820Registry: ERC1820Registry
+erc1820RegistryAddress: constant(address) = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
+
 name: public(string[64])
 symbol: public(string[32])
 totalSupply: public(uint256)
@@ -86,8 +88,6 @@ balanceOf: map(address, uint256)
 defaultOperators: map(address, bool)
 operators: map(address, map(address, bool))
 
-erc1820Registry_Address: constant(address) = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
-erc1820Registry: ERC1820Registry
 
 @public
 def __init__(
@@ -104,7 +104,7 @@ def __init__(
     for i in range(4):
         if _defaultOperators[i] != ZERO_ADDRESS:
             self.defaultOperators[_defaultOperators[i]] = True
-    self.erc1820Registry = ERC1820Registry(erc1820Registry_Address)
+    self.erc1820Registry = ERC1820Registry(erc1820RegistryAddress)
     self.erc1820Registry.setInterfaceImplementer(self, keccak256('ERC777Token'), self)
 
 
