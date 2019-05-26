@@ -23,12 +23,13 @@ TokensSent: event({
 
 
 erc1820Registry: ERC1820Registry
+erc1820RegistryAddress: constant(address) = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
 
 
 @public
 def __init__():
-    self.erc1820Registry = ERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24)
-    self.erc1820Registry.setInterfaceImplementer(self, keccak256('ERC777TokensSender'), self)
+    self.erc1820Registry = ERC1820Registry(erc1820RegistryAddress)
+    self.erc1820Registry.setInterfaceImplementer(self, keccak256("ERC777TokensSender"), self)
 
 
 @public

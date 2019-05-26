@@ -3,7 +3,6 @@
 
 # ERC777 Token Standard (https://eips.ethereum.org/EIPS/eip-777)
 
-
 # Interface for ERC1820 registry contract (http://eips.ethereum.org/EIPS/eip-1820)
 contract ERC1820Registry:
     def setInterfaceImplementer(
@@ -105,7 +104,7 @@ def __init__(
         if _defaultOperators[i] != ZERO_ADDRESS:
             self.defaultOperators[_defaultOperators[i]] = True
     self.erc1820Registry = ERC1820Registry(erc1820RegistryAddress)
-    self.erc1820Registry.setInterfaceImplementer(self, keccak256('ERC777Token'), self)
+    self.erc1820Registry.setInterfaceImplementer(self, keccak256("ERC777Token"), self)
 
 
 @private
@@ -118,7 +117,7 @@ def _checkForERC777TokensInterface_Sender(
     _data: bytes[256]="",
     _operatorData: bytes[256]=""
   ):
-    implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256('ERC777TokensSender'))
+    implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256("ERC777TokensSender"))
     if implementer != ZERO_ADDRESS:
         ERC777TokensSender(_from).tokensToSend(_operator, _from, _to, _amount, _data, _operatorData)
 
@@ -133,7 +132,7 @@ def _checkForERC777TokensInterface_Recipient(
     _data: bytes[256]="",
     _operatorData: bytes[256]=""
   ):
-    implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256('ER777TokenRecipient'))
+    implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256("ER777TokenRecipient"))
     if implementer != ZERO_ADDRESS:
         ERC777TokensRecipient(_to).tokensReceived(_operator, _from, _to, _amount, _data, _operatorData)
 
