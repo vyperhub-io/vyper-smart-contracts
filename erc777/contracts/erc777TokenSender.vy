@@ -31,7 +31,7 @@ def __init__():
     self.erc1820Registry.setInterfaceImplementer(self, keccak256('ERC777TokensSender'), self)
 
 
-@private
+@public
 def tokensToSend(
     _operator: address,
     _from: address,
