@@ -1,7 +1,5 @@
 # ERC777
 https://eips.ethereum.org/EIPS/eip-777
 
-## Run tests
-```bash
-$ truffle test --network ganache
-```
+## Tests
+Tests for this implementation can be found [here](https://github.com/0xjac/ERC777/tree/master/test).
