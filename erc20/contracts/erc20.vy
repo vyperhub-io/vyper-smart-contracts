@@ -1,7 +1,7 @@
 # Author: Sören Steiger, github.com/ssteiger
 # License: MIT
 
-# ERC20 Token Standard 
+# ERC20 Token Standard
 # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
 
 
@@ -116,12 +116,12 @@ def transferFrom(_from: address, _to: address, _value: uint256) -> bool:
     # NOTE: vyper does not allow unterflows
     #       so checks for sufficient funds are done implicitly
     #       see https://github.com/ethereum/vyper/issues/1237#issuecomment-461957413
+    # update approved funds
+    self.approvedFunds[_from][msg.sender] -= _value
     # update sender balance
     self.balanceOf[_from] -= _value
     # update recipient balance
     self.balanceOf[_to] += _value
-    # update approved funds
-    self.approvedFunds[_from][msg.sender] -= _value
     # fire transfer event
     log.Transfer(_from, _to, _value)
     return True
