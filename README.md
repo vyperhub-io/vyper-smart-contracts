@@ -14,4 +14,4 @@ This makes it easy to quickly compile and test them locally.
 | [Linear optimization problem bounty](linear_optimization_problem_bounty/) | [Link](linear_optimization_problem_bounty/contracts/linear_optimization_problem_bounty.vy) | [Link](linear_optimization_problem_bounty/tests/linear_optimization_problem_bounty.js) |
 | [VyperStorage](erc20/) | [Link](vyperStorage/contracts/VyperStorage.vy) | [Link](vyperStorage/tests/vyperStorage.js) |
 
-**Disclaimer:** All contracts in this repository as well as contracts hosted at [vyperhub.io](https://vyperhub.io/) are in beta and should not be used in production! We are not responsible for any losses that occure when using these or related contracts.
+**Disclaimer:** All contracts in this repository as well as contracts hosted at [vyperhub.io](https://contracts.vyperhub.io/) are in beta and should not be used in production! We are not responsible for any losses that occure when using these or related contracts.
