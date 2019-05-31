@@ -13,6 +13,6 @@ of the following standards:
 $ truffle test --network ganache
 ```
 
-The wallet contract accesses the `ERC1820Registry` contract in its constructor.
+The `wallet` contract accesses the `ERC1820Registry` contract in its constructor.
 It is therefore necessary that the `ERC1820Registry` contract exists on the (test) network to where the `wallet` contract gets deployed.
 In `migrations/1_initial_migration.js` a check is performed to determine if the `ERC1820Registry` contract exists - if it doesn't it is deployed.
