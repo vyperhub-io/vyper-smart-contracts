@@ -1,7 +1,7 @@
-var Migrations = artifacts.require("./Migrations.sol");
+const Migrations = artifacts.require("./Migrations.sol");
 
 // NOTE: this address has to match the 'from' address used in 'truffle.js'
-const truffleFromAddress = '0x954e72fdc51Cf919203067406fB337Ed4bDC8CdA'
+const truffleFromAddress = '0x954e72fdc51Cf919203067406fB337Ed4bDC8CdA';
 
 module.exports = async function(deployer) {
   // check if erc1820 registry contract exists on network
