@@ -8,30 +8,35 @@ const args = {
 }
 
 contract("ERC20", async accounts => {
+  beforeEach(async () => {
+    erc20Token = await erc20.new(
+      args.name,
+      args.symbol,
+      args.decimals,
+      args.totalSupply,
+      { from: accounts[0] }
+    );
+  });
+
   it(`...should set name to ${args.name}.`, async () => {
-    const erc20Token = await erc20.deployed({...args});
     // get token name
     const erc20_name = await erc20Token.name();
     assert.equal(erc20_name, args.name, "The token name was not correctly set.");
   });
 
   it(`...should set symbol to ${args.symbol}.`, async () => {
-    const erc20Token = await erc20.deployed({...args});
     // get token symbol
     const erc20_symbol = await erc20Token.symbol();
     assert.equal(erc20_symbol, args.symbol, "The token symbol was not correctly set.");
   });
 
   it(`...should set decimals to ${args.decimals}.`, async () => {
-    const erc20Token = await erc20.deployed({...args});
     // get token decimals
     const erc20_decimals = await erc20Token.decimals();
     assert.equal(erc20_decimals, args.decimals, "The tokens decimals were not correctly set.");
   });
 
-  // TODO: expected <BN: 52b7d2dcc80cd2e4000000> to equal 100000000
   it(`...should set totalSupply to ${args.totalSupply * 10 ** args.decimals}.`, async () => {
-    const erc20Token = await erc20.deployed({...args});
     // get token totalSupply
     let erc20_totalSupply = await erc20Token.totalSupply();
     erc20_totalSupply = erc20_totalSupply.toString();
@@ -44,8 +49,6 @@ contract("ERC20", async accounts => {
     const receiver = accounts[1];
 
     const amount = 100;
-
-    const erc20Token = await erc20.deployed({...args});
 
     let balance = await erc20Token.balanceOf.call(sender);
     const sender_starting_balance = balance.toString();
@@ -78,7 +81,6 @@ contract("ERC20", async accounts => {
     const spender = accounts[1];
 
     const amount = 100;
-    const erc20Token = await erc20.deployed();
 
     // get allowance before 'approve'
     let allowance = await erc20Token.allowance.call(owner, spender);
@@ -103,8 +105,6 @@ contract("ERC20", async accounts => {
     const sender = accounts[1];
 
     const amount = 100;
-
-    const erc20Token = await erc20.deployed({...args});
 
     allowance = await erc20Token.allowance.call(owner, sender);
     const sender_starting_allowance = allowance.toString();
