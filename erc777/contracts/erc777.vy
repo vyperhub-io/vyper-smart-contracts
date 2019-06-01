@@ -82,7 +82,7 @@ symbol: public(string[32])
 totalSupply: public(uint256)
 granularity: public(uint256)
 
-balanceOf: map(address, uint256)
+balanceOf: public(map(address, uint256))
 
 defaultOperators: map(address, bool)
 operators: map(address, map(address, bool))
