@@ -58,7 +58,8 @@ def __init__(_name: string[64], _symbol: string[32], _decimals: uint256, _totalS
     self.name = _name
     self.symbol = _symbol
     self.decimals = _decimals
-    self.totalSupply = _totalSupply * 10 ** _decimals
+    #self.totalSupply = _totalSupply * 10 ** _decimals
+    self.totalSupply = _totalSupply
     # mint all tokens to the contract creator
     self.balanceOf[msg.sender] = self.totalSupply
     # fire transfer event
