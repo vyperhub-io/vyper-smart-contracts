@@ -10,8 +10,7 @@ contract ERC1820Registry:
 
 
 contract ERC20Token:
-    def transferFrom(
-        _from: address,
+    def transfer(
         _to: address,
         _value: uint256,
     ) -> bool: modifying
@@ -53,7 +52,6 @@ ERC20Received: event({
 
 ERC20Sent: event({
     _token: address,
-    _from: address,
     _to: address,
     _amount: uint256
 })
@@ -153,8 +151,8 @@ def sendERC20(
     _to: address,
     _amount: uint256
   ):
-    ERC20Token(_token).transferFrom(self, _to, _amount)
-    log.ERC20Sent(_token, self, _to, _amount)
+    ERC20Token(_token).transfer(_to, _amount)
+    log.ERC20Sent(_token, _to, _amount)
 
 
 @public
