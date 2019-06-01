@@ -14,7 +14,7 @@ contract ERC20Token:
         _from: address,
         _to: address,
         _value: uint256,
-    ): modifying
+    ) -> bool: modifying
 
 
 contract ERC721Token:
