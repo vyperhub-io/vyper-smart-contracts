@@ -71,24 +71,23 @@ ERC721Sent: event({
     _data: bytes[256]
 })
 
-ERC777Received: event({
-    _operator: address,
-    _from: address,
-    _to: address,
+TokensReceived: event({
+    _operator: indexed(address),
+    _from: indexed(address),
+    _to: indexed(address),
     _amount: uint256,
     _data: bytes[256],
     _operatorData: bytes[256]
 })
 
-ERC777Sent: event({
-    _token: address,
-    _from: address,
-    _to: address,
+TokensSent: event({
+    _operator: indexed(address),
+    _from: indexed(address),
+    _to: indexed(address),
     _amount: uint256,
     _data: bytes[256],
     _operatorData: bytes[256]
 })
-
 
 erc1820Registry: ERC1820Registry
 erc1820RegistryAddress: constant(address) = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
@@ -101,6 +100,7 @@ def __init__():
     self.owner = msg.sender
     self.erc1820Registry = ERC1820Registry(erc1820RegistryAddress)
     self.erc1820Registry.setInterfaceImplementer(self, keccak256("ERC777TokensRecipient"), self)
+    self.erc1820Registry.setInterfaceImplementer(self, keccak256("ERC777TokensSender"), self)
 
 
 # ETH
@@ -108,32 +108,6 @@ def __init__():
 @payable
 def __default__():
     log.ETHReceived(msg.sender, msg.value)
-
-
-# ERC721
-@public
-def onERC721Received(
-    _token: address,
-    _from: address,
-    _tokenId: uint256,
-    _data: bytes32
-  ) -> bytes32:
-    log.ERC721Received(_token, _from, _tokenId, _data)
-    # TODO: need to return bytes4
-    return keccak256("onERC721Received(address,address,uint256,bytes)")
-
-
-# ERC777
-@public
-def tokensReceived(
-    _operator: address,
-    _from: address,
-    _to: address,
-    _amount: uint256,
-    _data: bytes[256],
-    _operatorData: bytes[256]
-  ):
-    log.ERC777Received(_operator, _from, _to, _amount, _data, _operatorData)
 
 
 @public
@@ -166,6 +140,19 @@ def sendERC721(
     log.ERC721Sent(_token, self, _to, _tokenId, _data)
 
 
+# ERC721
+@public
+def onERC721Received(
+    _token: address,
+    _from: address,
+    _tokenId: uint256,
+    _data: bytes32
+  ) -> bytes32:
+    log.ERC721Received(_token, _from, _tokenId, _data)
+    # TODO: need to return bytes4
+    return keccak256("onERC721Received(address,address,uint256,bytes)")
+
+
 @public
 def sendERC777(
     _token: address,
@@ -175,4 +162,28 @@ def sendERC777(
     _operatorData: bytes[256]=""
   ):
     ERC777Token(_token).operatorSend(self, _to, _amount, _data, _operatorData)
-    log.ERC777Sent(_token, self, _to, _amount, _data, _operatorData)
+
+
+# ERC777 Hooks
+@public
+def tokensReceived(
+    _operator: address,
+    _from: address,
+    _to: address,
+    _amount: uint256,
+    _data: bytes[256],
+    _operatorData: bytes[256]
+  ):
+  log.TokensReceived(_operator, _from, _to, _amount, _data, _operatorData)
+
+
+@public
+def tokensToSend(
+    _operator: address,
+    _from: address,
+    _to: address,
+    _amount: uint256,
+    _data: bytes[256],
+    _operatorData: bytes[256]
+  ):
+  log.TokensSent(_operator, _from, _to, _amount, _data, _operatorData)
