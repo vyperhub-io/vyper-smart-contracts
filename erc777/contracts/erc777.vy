@@ -134,7 +134,7 @@ def _checkForERC777TokensInterface_Recipient(
     _data: bytes[256]="",
     _operatorData: bytes[256]=""
   ):
-    implementer: address = self.erc1820Registry.getInterfaceImplementer(_to, keccak256("ER777TokenRecipient"))
+    implementer: address = self.erc1820Registry.getInterfaceImplementer(_to, keccak256("ERC777TokensRecipient"))
     if implementer != ZERO_ADDRESS:
         ERC777TokensRecipient(_to).tokensReceived(_operator, _from, _to, _amount, _data, _operatorData)
 
