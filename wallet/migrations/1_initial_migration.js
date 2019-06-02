@@ -6,7 +6,7 @@ const truffleFromAddress = '0x954e72fdc51Cf919203067406fB337Ed4bDC8CdA';
 module.exports = async function(deployer) {
   // check if erc1820 registry contract exists on network
   // http://eips.ethereum.org/EIPS/eip-1820
-  console.log('check if erc1820Registry contract exists on network')
+  console.log('check if erc1820Registry contract exists on network');
   const erc1820Exists = await web3.eth.getCode('0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24');
   // NOTE: If no contract exists at address, '0x' is returned
   if (erc1820Exists == '0x') {

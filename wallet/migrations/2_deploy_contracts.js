@@ -3,20 +3,22 @@ const erc721 = artifacts.require('erc721');
 const erc777 = artifacts.require('erc777');
 const wallet = artifacts.require('wallet');
 
+const truffleFromAddress = '0x954e72fdc51Cf919203067406fB337Ed4bDC8CdA';
+
 const args = {
   erc20: {
-    name: "My20Token",
-    symbol: "MT20",
+    name: 'My20Token',
+    symbol: 'MT20',
     decimals: 18,
     totalSupply: 100000000,
   },
   erc777: {
-    name: "My777Token",
-    symbol: "MT777",
+    name: 'My777Token',
+    symbol: 'MT777',
     totalSupply: 100000000,
     granularity: 1,
     defaultOperators: [
-      '0x0000000000000000000000000000000000000000',
+      truffleFromAddress,
       '0x0000000000000000000000000000000000000000',
       '0x0000000000000000000000000000000000000000',
       '0x0000000000000000000000000000000000000000',

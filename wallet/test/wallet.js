@@ -4,14 +4,15 @@ const erc777 = artifacts.require('erc777');
 
 const walletAbstraction = artifacts.require('wallet');
 
-let wallet;
+let wallet, walletOwner;
 
 contract('wallet', accounts => {
   beforeEach(async () => {
     wallet = await walletAbstraction.new({ from: accounts[0] });
+    walletOwner = accounts[0];
   });
 
-  it('...should accept erc20 token deposit.', async () => {
+  it('...should accept erc20 tokens deposit.', async () => {
     const sender = accounts[0];
 
     const erc20Token = await erc20.deployed();
@@ -34,7 +35,6 @@ contract('wallet', accounts => {
   });
 
   it('...should send erc20 tokens.', async () => {
-    const walletOwner = accounts[0];
     const receiver = accounts[1];
 
     const amount = 100;
@@ -92,4 +92,48 @@ contract('wallet', accounts => {
       'ERC721 token was not correctly deposited'
     );
   });
+
+  it('...should accept erc777 tokens deposit.', async () => {
+    const amount = 80;
+
+    const erc777Token = await erc777.deployed();
+
+    let balance = await erc777Token.balanceOf.call(wallet.address);
+    const wallet_starting_balance = balance.toString();
+
+    await erc777Token.mint(wallet.address, amount);
+
+    balance = await erc777Token.balanceOf.call(wallet.address);
+    const wallet_ending_balance = balance.toString();
+
+    assert.equal(
+      wallet_starting_balance,
+      wallet_ending_balance - amount,
+      'ERC777 token was not correctly deposited'
+    );
+  });
+
+  it('...should send erc777 tokens.', async () => {
+    const receiver = accounts[1];
+
+    const amount = 120;
+
+    const erc777Token = await erc777.deployed();
+    await erc777Token.mint(wallet.address, amount);
+
+    let balance = await erc777Token.balanceOf.call(wallet.address);
+    const wallet_starting_balance = balance.toString();
+
+    await wallet.sendERC777(erc777Token.address, receiver, amount, { from: walletOwner, gas: 3000000 });
+
+    balance = await erc777Token.balanceOf.call(wallet.address);
+    const wallet_ending_balance = balance.toString();
+
+    assert.equal(
+      wallet_starting_balance - amount,
+      wallet_ending_balance,
+      'ERC777 token was not correctly transfered'
+    );
+  });
+
 });
