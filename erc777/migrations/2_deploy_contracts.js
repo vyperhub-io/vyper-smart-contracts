@@ -1,11 +1,28 @@
-var ERC777 = artifacts.require("erc777");
+const erc777 = artifacts.require('erc777');
+
+// NOTE: this address has to match the 'from' address used in 'truffle.js'
+const truffleFromAddress = '0x954e72fdc51Cf919203067406fB337Ed4bDC8CdA';
+
+const args = {
+  name: 'My777Token',
+  symbol: 'MT777',
+  totalSupply: 100000000,
+  granularity: 1,
+  defaultOperators: [
+    truffleFromAddress,
+    '0x0000000000000000000000000000000000000000',
+    '0x0000000000000000000000000000000000000000',
+    '0x0000000000000000000000000000000000000000',
+  ],
+}
 
 module.exports = function(deployer) {
-  const name = "MyToken";
-  const symbol = "MT";
-  const totalSupply = 100000000;
-  const granularity = 1;
-  const defaultOperators = [];
-
-  deployer.deploy(ERC777, name, symbol, totalSupply, granularity, defaultOperators);
+  deployer.deploy(
+    erc777,
+    args.name,
+    args.symbol,
+    args.totalSupply,
+    args.granularity,
+    args.defaultOperators
+  );
 };
