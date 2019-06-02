@@ -48,10 +48,10 @@ Sent: event({
 })
 
 Minted: event({
-    _operator: indexed(address), # Address which triggered the burn.
-    _to: indexed(address),       # Holder whose tokens were burned.
-    _amount: uint256,            # Number of tokens burned.
-    _data: bytes[256],           # Information provided by the holder.
+    _operator: indexed(address), # Address which triggered the mint.
+    _to: indexed(address),       # Recipient of the tokens.
+    _amount: uint256,            # Number of tokens minted.
+    _data: bytes[256],           # Information provided for the recipient.
     _operatorData: bytes[256]    # Information provided by the operator.
 })
 
