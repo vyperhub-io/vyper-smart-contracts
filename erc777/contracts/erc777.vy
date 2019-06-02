@@ -1,9 +1,11 @@
 # Author: Sören Steiger, github.com/ssteiger
 # License: MIT
 
-# ERC777 Token Standard (https://eips.ethereum.org/EIPS/eip-777)
+# ERC777 Token Standard
+# https://eips.ethereum.org/EIPS/eip-777
 
-# Interface for ERC1820 registry contract (http://eips.ethereum.org/EIPS/eip-1820)
+# Interface for ERC1820 registry contract
+# https://eips.ethereum.org/EIPS/eip-1820
 contract ERC1820Registry:
     def setInterfaceImplementer(
         _addr: address,
