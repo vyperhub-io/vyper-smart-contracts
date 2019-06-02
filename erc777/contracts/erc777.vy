@@ -150,11 +150,18 @@ def _transferFunds(
   ):
     # any minting, sending or burning of tokens MUST be a multiple of the granularity value.
     assert _amount % self.granularity == 0
+
+    # check for 'tokensToSend' hook
     if _from.is_contract:
-        self._checkForERC777TokensInterface_Sender(_operator, _from, _to, _amount, _data, _operatorData)
+        implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256("ERC777TokensSender"))
+        if implementer != ZERO_ADDRESS:
+            ERC777TokensSender(_from).tokensToSend(_operator, _from, _to, _amount, _data, _operatorData)
+
     self.balanceOf[_from] -= _amount
     self.balanceOf[_to] += _amount
-    # only check for `tokensReceived` hook if transfer is not a burn
+
+    # check for 'tokensReceived' hook
+    # but only if transfer is not a burn
     if _to != ZERO_ADDRESS:
         if _to.is_contract:
             self._checkForERC777TokensInterface_Recipient(_operator, _from, _to, _amount, _data, _operatorData)
