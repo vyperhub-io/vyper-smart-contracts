@@ -228,7 +228,6 @@ def operatorBurn(
 # NOTE: ERC777 intentionally does not define specific functions to mint tokens.
 @public
 def mint(
-    _operator: address,
     _to: address,
     _amount: uint256,
     _operatorData: bytes[256]=""
@@ -240,5 +239,5 @@ def mint(
     self.balanceOf[_to] += _amount
     self.totalSupply += _amount
     if _to.is_contract:
-        self._checkForERC777TokensInterface_Recipient(_operator, ZERO_ADDRESS, _to, _amount, data, _operatorData)
+        self._checkForERC777TokensInterface_Recipient(msg.sender, ZERO_ADDRESS, _to, _amount, data, _operatorData)
     log.Minted(msg.sender, _to, _amount, data, _operatorData)
