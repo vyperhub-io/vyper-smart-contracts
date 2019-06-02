@@ -1,9 +1,11 @@
 # Author: Sören Steiger, github.com/ssteiger
 # License: MIT
 
-# ERC777 Token Standard (https://eips.ethereum.org/EIPS/eip-777)
+# ERC777 Token Standard
+# https://eips.ethereum.org/EIPS/eip-777
 
-# Interface for ERC1820 registry contract (http://eips.ethereum.org/EIPS/eip-1820)
+# Interface for ERC1820 registry contract
+# https://eips.ethereum.org/EIPS/eip-1820
 contract ERC1820Registry:
     def setInterfaceImplementer(
         _addr: address,
@@ -48,10 +50,10 @@ Sent: event({
 })
 
 Minted: event({
-    _operator: indexed(address), # Address which triggered the burn.
-    _to: indexed(address),       # Holder whose tokens were burned.
-    _amount: uint256,            # Number of tokens burned.
-    _data: bytes[256],           # Information provided by the holder.
+    _operator: indexed(address), # Address which triggered the mint.
+    _to: indexed(address),       # Recipient of the tokens.
+    _amount: uint256,            # Number of tokens minted.
+    _data: bytes[256],           # Information provided for the recipient.
     _operatorData: bytes[256]    # Information provided by the operator.
 })
 
@@ -82,7 +84,7 @@ symbol: public(string[32])
 totalSupply: public(uint256)
 granularity: public(uint256)
 
-balanceOf: map(address, uint256)
+balanceOf: public(map(address, uint256))
 
 defaultOperators: map(address, bool)
 operators: map(address, map(address, bool))
@@ -114,8 +116,8 @@ def _checkForERC777TokensInterface_Sender(
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256]="",
-    _operatorData: bytes[256]=""
+    _data: bytes[256],
+    _operatorData: bytes[256]
   ):
     implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256("ERC777TokensSender"))
     if implementer != ZERO_ADDRESS:
@@ -129,10 +131,10 @@ def _checkForERC777TokensInterface_Recipient(
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256]="",
-    _operatorData: bytes[256]=""
+    _data: bytes[256],
+    _operatorData: bytes[256]
   ):
-    implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256("ER777TokenRecipient"))
+    implementer: address = self.erc1820Registry.getInterfaceImplementer(_to, keccak256("ERC777TokensRecipient"))
     if implementer != ZERO_ADDRESS:
         ERC777TokensRecipient(_to).tokensReceived(_operator, _from, _to, _amount, _data, _operatorData)
 
@@ -143,16 +145,23 @@ def _transferFunds(
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256]="",
-    _operatorData: bytes[256]=""
+    _data: bytes[256],
+    _operatorData: bytes[256]
   ):
     # any minting, sending or burning of tokens MUST be a multiple of the granularity value.
     assert _amount % self.granularity == 0
+
+    # check for 'tokensToSend' hook
     if _from.is_contract:
-        self._checkForERC777TokensInterface_Sender(_operator, _from, _to, _amount, _data, _operatorData)
+        implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256("ERC777TokensSender"))
+        if implementer != ZERO_ADDRESS:
+            ERC777TokensSender(_from).tokensToSend(_operator, _from, _to, _amount, _data, _operatorData)
+
     self.balanceOf[_from] -= _amount
     self.balanceOf[_to] += _amount
-    # only check for `tokensReceived` hook if transfer is not a burn
+
+    # check for 'tokensReceived' hook
+    # but only if transfer is not a burn
     if _to != ZERO_ADDRESS:
         if _to.is_contract:
             self._checkForERC777TokensInterface_Recipient(_operator, _from, _to, _amount, _data, _operatorData)
@@ -172,14 +181,16 @@ def authorizeOperator(_operator: address):
 
 @public
 def revokeOperator(_operator: address):
+    # MUST revert if it is called to revoke the holder as an operator for itself
+    assert _operator != msg.sender
     (self.operators[msg.sender])[_operator] = False
     log.RevokedOperator(_operator, msg.sender)
 
 
 @public
-def send(_to: address, _amount: uint256, _data: bytes[256]=""):
+def send(_to: address, _amount: uint256, _data: bytes[256]="0x0"):
     assert _to != ZERO_ADDRESS
-    operatorData: bytes[256]=""
+    operatorData: bytes[256]="0x0"
     self._transferFunds(msg.sender, msg.sender, _to, _amount, _data, operatorData)
     log.Sent(msg.sender, msg.sender, _to, _amount, _data, operatorData)
 
@@ -189,8 +200,8 @@ def operatorSend(
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256]="",
-    _operatorData: bytes[256]=""
+    _data: bytes[256]="0x0",
+    _operatorData: bytes[256]="0x0"
   ):
     assert _to != ZERO_ADDRESS
     assert self.isOperatorFor(msg.sender, _from)
@@ -199,10 +210,10 @@ def operatorSend(
 
 
 @public
-def burn(_amount: uint256, _data: bytes[256]=""):
-    self._transferFunds(msg.sender, msg.sender, ZERO_ADDRESS, _amount, _data)
+def burn(_amount: uint256, _data: bytes[256]="0x0"):
+    operatorData: bytes[256]="0x0"
+    self._transferFunds(msg.sender, msg.sender, ZERO_ADDRESS, _amount, _data, operatorData)
     self.totalSupply -= _amount
-    operatorData: bytes[256]=""
     log.Burned(msg.sender, msg.sender, _amount, _data, operatorData)
 
 
@@ -210,8 +221,8 @@ def burn(_amount: uint256, _data: bytes[256]=""):
 def operatorBurn(
     _from: address,
     _amount: uint256,
-    _data: bytes[256]="",
-    _operatorData: bytes[256]=""
+    _data: bytes[256]="0x0",
+    _operatorData: bytes[256]="0x0"
   ):
     # _from: Token holder whose tokens will be burned (or 0x0 to set from to msg.sender).
     fromAddress: address
@@ -228,17 +239,18 @@ def operatorBurn(
 # NOTE: ERC777 intentionally does not define specific functions to mint tokens.
 @public
 def mint(
-    _operator: address,
     _to: address,
     _amount: uint256,
-    _operatorData: bytes[256]=""
+    _operatorData: bytes[256]="0x0"
   ):
-    data: bytes[256]=""
     assert _to != ZERO_ADDRESS
+    # any minting, sending or burning of tokens MUST be a multiple of the granularity value.
+    assert _amount % self.granularity == 0
     # only operators are allowed to mint
     assert self.defaultOperators[msg.sender]
     self.balanceOf[_to] += _amount
     self.totalSupply += _amount
+    data: bytes[256]="0x0"
     if _to.is_contract:
-        self._checkForERC777TokensInterface_Recipient(_operator, ZERO_ADDRESS, _to, _amount, data, _operatorData)
+        self._checkForERC777TokensInterface_Recipient(msg.sender, ZERO_ADDRESS, _to, _amount, data, _operatorData)
     log.Minted(msg.sender, _to, _amount, data, _operatorData)
