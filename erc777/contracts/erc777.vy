@@ -172,6 +172,8 @@ def authorizeOperator(_operator: address):
 
 @public
 def revokeOperator(_operator: address):
+    # MUST revert if it is called to revoke the holder as an operator for itself
+    assert _operator != msg.sender
     (self.operators[msg.sender])[_operator] = False
     log.RevokedOperator(_operator, msg.sender)
 
