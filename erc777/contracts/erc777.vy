@@ -234,12 +234,14 @@ def mint(
     _amount: uint256,
     _operatorData: bytes[256]=""
   ):
-    data: bytes[256]=""
     assert _to != ZERO_ADDRESS
+    # any minting, sending or burning of tokens MUST be a multiple of the granularity value.
+    assert _amount % self.granularity == 0
     # only operators are allowed to mint
     assert self.defaultOperators[msg.sender]
     self.balanceOf[_to] += _amount
     self.totalSupply += _amount
+    data: bytes[256]=""
     if _to.is_contract:
         self._checkForERC777TokensInterface_Recipient(msg.sender, ZERO_ADDRESS, _to, _amount, data, _operatorData)
     log.Minted(msg.sender, _to, _amount, data, _operatorData)
