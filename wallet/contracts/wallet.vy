@@ -5,33 +5,31 @@ contract ERC1820Registry:
     def setInterfaceImplementer(
         _addr: address,
         _interfaceHash: bytes32,
-        _implementer: address,
+        _implementer: address
     ): modifying
 
 
 contract ERC20Token:
     def transfer(
         _to: address,
-        _value: uint256,
+        _value: uint256
     ) -> bool: modifying
 
 
 contract ERC721Token:
     def safeTransferFrom(
-      _from: address,
-      _to: address,
-      _tokenId: uint256,
-      _data: bytes[256]
+        _from: address,
+        _to: address,
+        _tokenId: uint256,
+        _data: bytes[256]
     ): modifying
 
 
 contract ERC777Token:
-    def operatorSend(
-      _from: address,
-      _to: address,
-      _amount: uint256,
-      _data: bytes[256],
-      _operatorData: bytes[256]
+    def send(
+        _to: address,
+        _amount: uint256,
+        _data: bytes[256]
     ): modifying
 
 
@@ -71,7 +69,7 @@ ERC721Sent: event({
     _data: bytes[256]
 })
 
-TokensReceived: event({
+ERC777Received: event({
     _operator: indexed(address),
     _from: indexed(address),
     _to: indexed(address),
@@ -80,7 +78,7 @@ TokensReceived: event({
     _operatorData: bytes[256]
 })
 
-TokensSent: event({
+ERC777Sent: event({
     _operator: indexed(address),
     _from: indexed(address),
     _to: indexed(address),
@@ -158,10 +156,9 @@ def sendERC777(
     _token: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256]="",
-    _operatorData: bytes[256]=""
+    _data: bytes[256]="0x0"
   ):
-    ERC777Token(_token).operatorSend(self, _to, _amount, _data, _operatorData)
+    ERC777Token(_token).send(_to, _amount, _data)
 
 
 # ERC777 Hooks
@@ -171,10 +168,11 @@ def tokensReceived(
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256],
-    _operatorData: bytes[256]
+    _data: bytes[256]="0x0",
+    _operatorData: bytes[256]="0x0"
   ):
-  log.TokensReceived(_operator, _from, _to, _amount, _data, _operatorData)
+    # TODO: This is not working
+    log.ERC777Received(_operator, _from, _to, _amount, _data, _operatorData)
 
 
 @public
@@ -183,7 +181,7 @@ def tokensToSend(
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256],
-    _operatorData: bytes[256]
+    _data: bytes[256]="0x0",
+    _operatorData: bytes[256]="0x0"
   ):
-  log.TokensSent(_operator, _from, _to, _amount, _data, _operatorData)
+    log.ERC777Sent(_operator, _from, _to, _amount, _data, _operatorData)
