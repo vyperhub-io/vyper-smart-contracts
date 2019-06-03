@@ -1,6 +1,19 @@
 # Author: Sören Steiger, github.com/ssteiger
 # License: MIT
 
+
+# ATTENTION!!
+# NOTE: There is an error with vyper when using bytes[256]=""
+#       as default parameter in @private functions
+#       see: https://github.com/ethereum/vyper/issues/1463
+#
+# TODO: change:
+#       `_checkForERC777TokensInterface_Sender`
+#       `_checkForERC777TokensInterface_Recipient`
+#       `_transferFunds`
+#        from @public back to @private
+
+
 # ERC777 Token Standard
 # https://eips.ethereum.org/EIPS/eip-777
 
@@ -86,7 +99,9 @@ granularity: public(uint256)
 
 balanceOf: public(map(address, uint256))
 
-defaultOperators: map(address, bool)
+defaultOperatorsList: address[4]
+defaultOperatorsMap: map(address, bool)
+
 operators: map(address, map(address, bool))
 
 
@@ -100,53 +115,60 @@ def __init__(
   ):
     self.name = _name
     self.symbol = _symbol
-    self.totalSupply = _totalSupply * 10 ** _granularity
+    self.totalSupply = _totalSupply
     self.granularity = _granularity
+    self.defaultOperatorsList = _defaultOperators
     for i in range(4):
-        if _defaultOperators[i] != ZERO_ADDRESS:
-            self.defaultOperators[_defaultOperators[i]] = True
+        assert _defaultOperators[i] != ZERO_ADDRESS
+        self.defaultOperatorsMap[_defaultOperators[i]] = True
     self.erc1820Registry = ERC1820Registry(erc1820RegistryAddress)
     self.erc1820Registry.setInterfaceImplementer(self, keccak256("ERC777Token"), self)
 
 
-@private
+# TODO: change this back to @private!
+#       see: https://github.com/ethereum/vyper/issues/1463
+@public
 @constant
 def _checkForERC777TokensInterface_Sender(
     _operator: address,
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256],
-    _operatorData: bytes[256]
+    _data: bytes[256]="",
+    _operatorData: bytes[256]=""
   ):
     implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256("ERC777TokensSender"))
     if implementer != ZERO_ADDRESS:
         ERC777TokensSender(_from).tokensToSend(_operator, _from, _to, _amount, _data, _operatorData)
 
 
-@private
+# TODO: change this back to @private!
+#       see: https://github.com/ethereum/vyper/issues/1463
+@public
 @constant
 def _checkForERC777TokensInterface_Recipient(
     _operator: address,
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256],
-    _operatorData: bytes[256]
+    _data: bytes[256]="",
+    _operatorData: bytes[256]=""
   ):
     implementer: address = self.erc1820Registry.getInterfaceImplementer(_to, keccak256("ERC777TokensRecipient"))
     if implementer != ZERO_ADDRESS:
         ERC777TokensRecipient(_to).tokensReceived(_operator, _from, _to, _amount, _data, _operatorData)
 
 
-@private
+# TODO: change this back to @private!
+#       see: https://github.com/ethereum/vyper/issues/1463
+@public
 def _transferFunds(
     _operator: address,
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256],
-    _operatorData: bytes[256]
+    _data: bytes[256]="",
+    _operatorData: bytes[256]=""
   ):
     # any minting, sending or burning of tokens MUST be a multiple of the granularity value.
     assert _amount % self.granularity == 0
@@ -169,8 +191,14 @@ def _transferFunds(
 
 @public
 @constant
+def defaultOperators() -> address[4]:
+    return self.defaultOperatorsList
+
+
+@public
+@constant
 def isOperatorFor(_operator: address, _holder: address) -> bool:
-    return (self.operators[_holder])[_operator] or self.defaultOperators[_operator] or _operator == msg.sender
+    return (self.operators[_holder])[_operator] or self.defaultOperatorsMap[_operator] or _operator == msg.sender
 
 
 @public
@@ -188,9 +216,9 @@ def revokeOperator(_operator: address):
 
 
 @public
-def send(_to: address, _amount: uint256, _data: bytes[256]="0x0"):
+def send(_to: address, _amount: uint256, _data: bytes[256]=""):
     assert _to != ZERO_ADDRESS
-    operatorData: bytes[256]="0x0"
+    operatorData: bytes[256]=""
     self._transferFunds(msg.sender, msg.sender, _to, _amount, _data, operatorData)
     log.Sent(msg.sender, msg.sender, _to, _amount, _data, operatorData)
 
@@ -200,8 +228,8 @@ def operatorSend(
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256]="0x0",
-    _operatorData: bytes[256]="0x0"
+    _data: bytes[256]="",
+    _operatorData: bytes[256]=""
   ):
     assert _to != ZERO_ADDRESS
     assert self.isOperatorFor(msg.sender, _from)
@@ -210,8 +238,8 @@ def operatorSend(
 
 
 @public
-def burn(_amount: uint256, _data: bytes[256]="0x0"):
-    operatorData: bytes[256]="0x0"
+def burn(_amount: uint256, _data: bytes[256]=""):
+    operatorData: bytes[256]=""
     self._transferFunds(msg.sender, msg.sender, ZERO_ADDRESS, _amount, _data, operatorData)
     self.totalSupply -= _amount
     log.Burned(msg.sender, msg.sender, _amount, _data, operatorData)
@@ -221,8 +249,8 @@ def burn(_amount: uint256, _data: bytes[256]="0x0"):
 def operatorBurn(
     _from: address,
     _amount: uint256,
-    _data: bytes[256]="0x0",
-    _operatorData: bytes[256]="0x0"
+    _data: bytes[256]="",
+    _operatorData: bytes[256]=""
   ):
     # _from: Token holder whose tokens will be burned (or 0x0 to set from to msg.sender).
     fromAddress: address
@@ -241,16 +269,16 @@ def operatorBurn(
 def mint(
     _to: address,
     _amount: uint256,
-    _operatorData: bytes[256]="0x0"
+    _operatorData: bytes[256]=""
   ):
     assert _to != ZERO_ADDRESS
     # any minting, sending or burning of tokens MUST be a multiple of the granularity value.
     assert _amount % self.granularity == 0
     # only operators are allowed to mint
-    assert self.defaultOperators[msg.sender]
+    assert self.defaultOperatorsMap[msg.sender]
     self.balanceOf[_to] += _amount
     self.totalSupply += _amount
-    data: bytes[256]="0x0"
+    data: bytes[256]=""
     if _to.is_contract:
         self._checkForERC777TokensInterface_Recipient(msg.sender, ZERO_ADDRESS, _to, _amount, data, _operatorData)
     log.Minted(msg.sender, _to, _amount, data, _operatorData)
