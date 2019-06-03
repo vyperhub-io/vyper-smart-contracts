@@ -87,6 +87,7 @@ ERC777Sent: event({
     _operatorData: bytes[256]
 })
 
+
 erc1820Registry: ERC1820Registry
 erc1820RegistryAddress: constant(address) = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
 
@@ -156,7 +157,7 @@ def sendERC777(
     _token: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256]="0x0"
+    _data: bytes[256]=""
   ):
     ERC777Token(_token).send(_to, _amount, _data)
 
@@ -168,11 +169,12 @@ def tokensReceived(
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256]="0x0",
-    _operatorData: bytes[256]="0x0"
+    _data: bytes[256]="",
+    _operatorData: bytes[256]=""
   ):
     # TODO: This is not working
-    log.ERC777Received(_operator, _from, _to, _amount, _data, _operatorData)
+    #log.ERC777Received(_operator, _from, _to, _amount, _data, _operatorData)
+    assert True
 
 
 @public
@@ -181,7 +183,9 @@ def tokensToSend(
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256]="0x0",
-    _operatorData: bytes[256]="0x0"
+    _data: bytes[256]="",
+    _operatorData: bytes[256]=""
   ):
-    log.ERC777Sent(_operator, _from, _to, _amount, _data, _operatorData)
+    # TODO: This is not working
+    #log.ERC777Sent(_operator, _from, _to, _amount, _data, _operatorData)
+    assert True

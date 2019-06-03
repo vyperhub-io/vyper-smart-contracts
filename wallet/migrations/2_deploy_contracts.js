@@ -19,17 +19,16 @@ const args = {
     granularity: 1,
     defaultOperators: [
       truffleFromAddress,
-      '0x0000000000000000000000000000000000000000',
-      '0x0000000000000000000000000000000000000000',
-      '0x0000000000000000000000000000000000000000',
+      '0x0000000000000000000000000000000000000001',
+      '0x0000000000000000000000000000000000000002',
+      '0x0000000000000000000000000000000000000003',
     ],
   }
 }
 
-module.exports = async function(deployer) {
+module.exports = function(deployer) {
   if (deployer.network == 'ganache') {
-    // deploy contracts for testing purposes
-
+    // deploy contracts necessary for testing
     deployer.deploy(
       erc20,
       args.erc20.name,
@@ -48,7 +47,8 @@ module.exports = async function(deployer) {
       args.erc777.granularity,
       args.erc777.defaultOperators,
     );
-  }
+  } // if deployer.network == 'ganache'
 
+  // deploy wallet contract
   deployer.deploy(wallet);
 };

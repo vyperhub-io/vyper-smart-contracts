@@ -71,15 +71,13 @@ contract('wallet', accounts => {
 
     const erc20Token = await erc20.deployed();
 
-    let balance = await erc20Token.balanceOf.call(wallet.address);
-    const wallet_starting_balance = balance.toString();
+    const wallet_starting_balance = await erc20Token.balanceOf.call(wallet.address);
 
     const amount = 100;
 
     await erc20Token.transfer(wallet.address, amount, { from: sender });
 
-    balance = await erc20Token.balanceOf.call(wallet.address);
-    const wallet_ending_balance = balance.toString();
+    const wallet_ending_balance = await erc20Token.balanceOf.call(wallet.address);
 
     assert.equal(
       wallet_starting_balance,
@@ -96,16 +94,9 @@ contract('wallet', accounts => {
     const erc20Token = await erc20.deployed();
     await erc20Token.transfer(wallet.address, amount, { from: accounts[0] });
 
-    //let balance = await erc20Token.balanceOf.call(wallet.address);
-    //const wallet_starting_balance = balance.toString();
-
-    let balance = await erc20Token.balanceOf.call(receiver);
-    const receiver_starting_balance = balance.toString();
+    let receiver_starting_balance = await erc20Token.balanceOf.call(receiver);
 
     await wallet.sendERC20(erc20Token.address, receiver, amount, { from: walletOwner, gas: 4000000 });
-
-    //balance = await erc20Token.balanceOf.call(wallet.address);
-    //const wallet_ending_balance = balance.toString();
 
     balance = await erc20Token.balanceOf.call(receiver);
     const receiver_ending_balance = balance.toString();
@@ -152,13 +143,11 @@ contract('wallet', accounts => {
 
     const erc777Token = await erc777.deployed();
 
-    let balance = await erc777Token.balanceOf.call(wallet.address);
-    const wallet_starting_balance = balance.toString();
+    const wallet_starting_balance = await erc777Token.balanceOf.call(wallet.address);
 
     await erc777Token.mint(wallet.address, amount);
 
-    balance = await erc777Token.balanceOf.call(wallet.address);
-    const wallet_ending_balance = balance.toString();
+    const wallet_ending_balance = await erc777Token.balanceOf.call(wallet.address);
 
     assert.equal(
       wallet_starting_balance,
@@ -175,13 +164,11 @@ contract('wallet', accounts => {
     const erc777Token = await erc777.deployed();
     await erc777Token.mint(wallet.address, amount);
 
-    let balance = await erc777Token.balanceOf.call(wallet.address);
-    const wallet_starting_balance = balance.toString();
+    const wallet_starting_balance = await erc777Token.balanceOf.call(wallet.address);
 
     await wallet.sendERC777(erc777Token.address, receiver, amount, { from: walletOwner, gas: 3000000 });
 
-    balance = await erc777Token.balanceOf.call(wallet.address);
-    const wallet_ending_balance = balance.toString();
+    const wallet_ending_balance = await erc777Token.balanceOf.call(wallet.address);
 
     assert.equal(
       wallet_starting_balance - amount,
