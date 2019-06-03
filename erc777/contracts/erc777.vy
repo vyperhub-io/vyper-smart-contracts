@@ -1,6 +1,9 @@
 # Author: Sören Steiger, github.com/ssteiger
 # License: MIT
 
+# NOTE: Currently all default parameters are set to '0x0'
+#       See: https://github.com/ethereum/vyper/issues/1463
+
 # ERC777 Token Standard
 # https://eips.ethereum.org/EIPS/eip-777
 
