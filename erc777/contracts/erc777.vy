@@ -86,7 +86,7 @@ granularity: public(uint256)
 
 balanceOf: public(map(address, uint256))
 
-defaultOperators: public(address[4])
+defaultOperatorsList: address[4]
 defaultOperatorsMap: map(address, bool)
 
 operators: map(address, map(address, bool))
@@ -104,7 +104,7 @@ def __init__(
     self.symbol = _symbol
     self.totalSupply = _totalSupply
     self.granularity = _granularity
-    self.defaultOperators = _defaultOperators
+    self.defaultOperatorsList = _defaultOperators
     for i in range(4):
         assert _defaultOperators[i] != ZERO_ADDRESS
         self.defaultOperatorsMap[_defaultOperators[i]] = True
@@ -168,6 +168,12 @@ def _transferFunds(
     if _to != ZERO_ADDRESS:
         if _to.is_contract:
             self._checkForERC777TokensInterface_Recipient(_operator, _from, _to, _amount, _data, _operatorData)
+
+
+@public
+@constant
+def defaultOperators() -> address[4]:
+    return self.defaultOperatorsList
 
 
 @public
