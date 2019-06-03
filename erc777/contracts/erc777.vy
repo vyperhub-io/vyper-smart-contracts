@@ -106,8 +106,8 @@ def __init__(
     self.granularity = _granularity
     self.defaultOperators = _defaultOperators
     for i in range(4):
-        if _defaultOperators[i] != ZERO_ADDRESS:
-            self.defaultOperatorsMap[_defaultOperators[i]] = True
+        assert _defaultOperators[i] != ZERO_ADDRESS
+        self.defaultOperatorsMap[_defaultOperators[i]] = True
     self.erc1820Registry = ERC1820Registry(erc1820RegistryAddress)
     self.erc1820Registry.setInterfaceImplementer(self, keccak256("ERC777Token"), self)
 
