@@ -12,6 +12,60 @@ contract('wallet', accounts => {
     walletOwner = accounts[0];
   });
 
+  it('...should accept eth deposit.', async () => {
+    const sender = accounts[0];
+
+    const wallet_starting_balance = await web3.eth.getBalance(wallet.address);
+
+    const amount = web3.utils.toWei('1', 'ether');
+
+    await web3.eth.sendTransaction({
+      from: sender,
+      to: wallet.address,
+      value: amount
+    });
+
+    const wallet_ending_balance = await web3.eth.getBalance(wallet.address);
+
+    assert.equal(
+      wallet_starting_balance,
+      wallet_ending_balance - amount,
+      'ETH was not correctly deposited.'
+    );
+  });
+
+  it('...should send eth.', async () => {
+    const sender = accounts[0];
+    const receiver = accounts[1];
+
+    const amount = web3.utils.toWei('1', 'ether');
+
+    await web3.eth.sendTransaction({
+      from: sender,
+      to: wallet.address,
+      value: amount
+    });
+
+    const wallet_starting_balance = await web3.eth.getBalance(wallet.address);
+    const receiver_starting_balance = await web3.eth.getBalance(receiver);
+
+    await wallet.sendETH(receiver, amount, { from: walletOwner, gas: 40000 });
+
+    const wallet_ending_balance = await web3.eth.getBalance(wallet.address);
+    const receiver_ending_balance = await web3.eth.getBalance(receiver);
+
+    assert.equal(
+      wallet_starting_balance - amount,
+      wallet_ending_balance,
+      'ETH was not correctly sent.'
+    );
+    assert.equal(
+      receiver_starting_balance,
+      receiver_ending_balance - amount,
+      'ETH was not correctly sent.'
+    );
+  });
+
   it('...should accept erc20 tokens deposit.', async () => {
     const sender = accounts[0];
 
@@ -30,7 +84,7 @@ contract('wallet', accounts => {
     assert.equal(
       wallet_starting_balance,
       wallet_ending_balance - amount,
-      'ERC20 tokens were not correctly deposited'
+      'ERC20 tokens were not correctly deposited.'
     );
   });
 
@@ -59,7 +113,7 @@ contract('wallet', accounts => {
     assert.equal(
       receiver_starting_balance,
       receiver_ending_balance - amount,
-      'ERC20 tokens were not correctly credited'
+      'ERC20 tokens were not correctly credited.'
     );
   });
 
@@ -89,7 +143,7 @@ contract('wallet', accounts => {
     assert.equal(
       wallet.address,
       ownerOfNFT,
-      'ERC721 token was not correctly deposited'
+      'ERC721 token was not correctly deposited.'
     );
   });
 
@@ -109,7 +163,7 @@ contract('wallet', accounts => {
     assert.equal(
       wallet_starting_balance,
       wallet_ending_balance - amount,
-      'ERC777 token was not correctly deposited'
+      'ERC777 token was not correctly deposited.'
     );
   });
 
@@ -132,7 +186,7 @@ contract('wallet', accounts => {
     assert.equal(
       wallet_starting_balance - amount,
       wallet_ending_balance,
-      'ERC777 token was not correctly transfered'
+      'ERC777 token was not correctly sent.'
     );
   });
 
