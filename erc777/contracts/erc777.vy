@@ -86,7 +86,9 @@ granularity: public(uint256)
 
 balanceOf: public(map(address, uint256))
 
-defaultOperators: map(address, bool)
+defaultOperators: public(address[4])
+defaultOperatorsMap: map(address, bool)
+
 operators: map(address, map(address, bool))
 
 
@@ -102,9 +104,10 @@ def __init__(
     self.symbol = _symbol
     self.totalSupply = _totalSupply * 10 ** _granularity
     self.granularity = _granularity
+    self.defaultOperators = _defaultOperators
     for i in range(4):
         if _defaultOperators[i] != ZERO_ADDRESS:
-            self.defaultOperators[_defaultOperators[i]] = True
+            self.defaultOperatorsMap[_defaultOperators[i]] = True
     self.erc1820Registry = ERC1820Registry(erc1820RegistryAddress)
     self.erc1820Registry.setInterfaceImplementer(self, keccak256("ERC777Token"), self)
 
@@ -170,7 +173,7 @@ def _transferFunds(
 @public
 @constant
 def isOperatorFor(_operator: address, _holder: address) -> bool:
-    return (self.operators[_holder])[_operator] or self.defaultOperators[_operator] or _operator == msg.sender
+    return (self.operators[_holder])[_operator] or self.defaultOperatorsMap[_operator] or _operator == msg.sender
 
 
 @public
@@ -247,7 +250,7 @@ def mint(
     # any minting, sending or burning of tokens MUST be a multiple of the granularity value.
     assert _amount % self.granularity == 0
     # only operators are allowed to mint
-    assert self.defaultOperators[msg.sender]
+    assert self.defaultOperatorsMap[msg.sender]
     self.balanceOf[_to] += _amount
     self.totalSupply += _amount
     data: bytes[256]="0x0"
