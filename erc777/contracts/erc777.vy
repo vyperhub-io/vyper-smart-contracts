@@ -102,7 +102,7 @@ def __init__(
   ):
     self.name = _name
     self.symbol = _symbol
-    self.totalSupply = _totalSupply * 10 ** _granularity
+    self.totalSupply = _totalSupply
     self.granularity = _granularity
     self.defaultOperators = _defaultOperators
     for i in range(4):
