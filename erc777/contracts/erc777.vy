@@ -1,8 +1,12 @@
 # Author: Sören Steiger, github.com/ssteiger
 # License: MIT
 
-# NOTE: Currently all default parameters are set to '0x0'
-#       See: https://github.com/ethereum/vyper/issues/1463
+# NOTE: There is an error with vyper when using bytes[256]=""
+#       as default paramter in @private functions
+#       see: https://github.com/ethereum/vyper/issues/1463
+#
+# TODO: change `_checkForERC777TokensInterface_Sender`
+#       and `_checkForERC777TokensInterface_Recipient` from @public to @private
 
 # ERC777 Token Standard
 # https://eips.ethereum.org/EIPS/eip-777
@@ -115,30 +119,34 @@ def __init__(
     self.erc1820Registry.setInterfaceImplementer(self, keccak256("ERC777Token"), self)
 
 
-@private
+# TODO: change this back to @private!
+#       see: https://github.com/ethereum/vyper/issues/1463
+@public
 @constant
 def _checkForERC777TokensInterface_Sender(
     _operator: address,
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256],
-    _operatorData: bytes[256]
+    _data: bytes[256]="",
+    _operatorData: bytes[256]=""
   ):
     implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256("ERC777TokensSender"))
     if implementer != ZERO_ADDRESS:
         ERC777TokensSender(_from).tokensToSend(_operator, _from, _to, _amount, _data, _operatorData)
 
 
-@private
+# TODO: change this back to @private!
+#       see: https://github.com/ethereum/vyper/issues/1463
+@public
 @constant
 def _checkForERC777TokensInterface_Recipient(
     _operator: address,
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256],
-    _operatorData: bytes[256]
+    _data: bytes[256]="",
+    _operatorData: bytes[256]=""
   ):
     implementer: address = self.erc1820Registry.getInterfaceImplementer(_to, keccak256("ERC777TokensRecipient"))
     if implementer != ZERO_ADDRESS:
@@ -200,9 +208,9 @@ def revokeOperator(_operator: address):
 
 
 @public
-def send(_to: address, _amount: uint256, _data: bytes[256]="0x0"):
+def send(_to: address, _amount: uint256, _data: bytes[256]=""):
     assert _to != ZERO_ADDRESS
-    operatorData: bytes[256]="0x0"
+    operatorData: bytes[256]=""
     self._transferFunds(msg.sender, msg.sender, _to, _amount, _data, operatorData)
     log.Sent(msg.sender, msg.sender, _to, _amount, _data, operatorData)
 
@@ -212,8 +220,8 @@ def operatorSend(
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256]="0x0",
-    _operatorData: bytes[256]="0x0"
+    _data: bytes[256]="",
+    _operatorData: bytes[256]=""
   ):
     assert _to != ZERO_ADDRESS
     assert self.isOperatorFor(msg.sender, _from)
@@ -222,8 +230,8 @@ def operatorSend(
 
 
 @public
-def burn(_amount: uint256, _data: bytes[256]="0x0"):
-    operatorData: bytes[256]="0x0"
+def burn(_amount: uint256, _data: bytes[256]=""):
+    operatorData: bytes[256]=""
     self._transferFunds(msg.sender, msg.sender, ZERO_ADDRESS, _amount, _data, operatorData)
     self.totalSupply -= _amount
     log.Burned(msg.sender, msg.sender, _amount, _data, operatorData)
@@ -233,8 +241,8 @@ def burn(_amount: uint256, _data: bytes[256]="0x0"):
 def operatorBurn(
     _from: address,
     _amount: uint256,
-    _data: bytes[256]="0x0",
-    _operatorData: bytes[256]="0x0"
+    _data: bytes[256]="",
+    _operatorData: bytes[256]=""
   ):
     # _from: Token holder whose tokens will be burned (or 0x0 to set from to msg.sender).
     fromAddress: address
@@ -253,7 +261,7 @@ def operatorBurn(
 def mint(
     _to: address,
     _amount: uint256,
-    _operatorData: bytes[256]="0x0"
+    _operatorData: bytes[256]=""
   ):
     assert _to != ZERO_ADDRESS
     # any minting, sending or burning of tokens MUST be a multiple of the granularity value.
@@ -262,7 +270,7 @@ def mint(
     assert self.defaultOperatorsMap[msg.sender]
     self.balanceOf[_to] += _amount
     self.totalSupply += _amount
-    data: bytes[256]="0x0"
+    data: bytes[256]=""
     if _to.is_contract:
         self._checkForERC777TokensInterface_Recipient(msg.sender, ZERO_ADDRESS, _to, _amount, data, _operatorData)
     log.Minted(msg.sender, _to, _amount, data, _operatorData)
