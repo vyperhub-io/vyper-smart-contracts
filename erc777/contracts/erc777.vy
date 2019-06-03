@@ -1,12 +1,18 @@
 # Author: Sören Steiger, github.com/ssteiger
 # License: MIT
 
+
+# ATTENTION!!
 # NOTE: There is an error with vyper when using bytes[256]=""
-#       as default paramter in @private functions
+#       as default parameter in @private functions
 #       see: https://github.com/ethereum/vyper/issues/1463
 #
-# TODO: change `_checkForERC777TokensInterface_Sender`
-#       and `_checkForERC777TokensInterface_Recipient` from @public to @private
+# TODO: change:
+#       `_checkForERC777TokensInterface_Sender`
+#       `_checkForERC777TokensInterface_Recipient`
+#       `_transferFunds`
+#        from @public back to @private
+
 
 # ERC777 Token Standard
 # https://eips.ethereum.org/EIPS/eip-777
@@ -153,14 +159,16 @@ def _checkForERC777TokensInterface_Recipient(
         ERC777TokensRecipient(_to).tokensReceived(_operator, _from, _to, _amount, _data, _operatorData)
 
 
-@private
+# TODO: change this back to @private!
+#       see: https://github.com/ethereum/vyper/issues/1463
+@public
 def _transferFunds(
     _operator: address,
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256],
-    _operatorData: bytes[256]
+    _data: bytes[256]="",
+    _operatorData: bytes[256]=""
   ):
     # any minting, sending or burning of tokens MUST be a multiple of the granularity value.
     assert _amount % self.granularity == 0
