@@ -1,21 +1,9 @@
 # Author: Sören Steiger, github.com/ssteiger
 # License: MIT
 
-
-# ATTENTION!!
-# NOTE: There is an error with vyper when using bytes[256]=""
-#       as default parameter in @private functions
-#       see: https://github.com/ethereum/vyper/issues/1463
-#
-# TODO: change:
-#       `_checkForERC777TokensInterface_Sender`
-#       `_checkForERC777TokensInterface_Recipient`
-#       `_transferFunds`
-#        from @public back to @private
-
-
 # ERC777 Token Standard
 # https://eips.ethereum.org/EIPS/eip-777
+
 
 # Interface for ERC1820 registry contract
 # https://eips.ethereum.org/EIPS/eip-1820
@@ -125,9 +113,7 @@ def __init__(
     self.erc1820Registry.setInterfaceImplementer(self, keccak256("ERC777Token"), self)
 
 
-# TODO: change this back to @private!
-#       see: https://github.com/ethereum/vyper/issues/1463
-@public
+@private
 @constant
 def _checkForERC777TokensInterface_Sender(
     _operator: address,
@@ -142,9 +128,7 @@ def _checkForERC777TokensInterface_Sender(
         ERC777TokensSender(_from).tokensToSend(_operator, _from, _to, _amount, _data, _operatorData)
 
 
-# TODO: change this back to @private!
-#       see: https://github.com/ethereum/vyper/issues/1463
-@public
+@private
 @constant
 def _checkForERC777TokensInterface_Recipient(
     _operator: address,
@@ -159,9 +143,7 @@ def _checkForERC777TokensInterface_Recipient(
         ERC777TokensRecipient(_to).tokensReceived(_operator, _from, _to, _amount, _data, _operatorData)
 
 
-# TODO: change this back to @private!
-#       see: https://github.com/ethereum/vyper/issues/1463
-@public
+@private
 def _transferFunds(
     _operator: address,
     _from: address,
