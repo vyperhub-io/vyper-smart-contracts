@@ -180,7 +180,7 @@ def defaultOperators() -> address[4]:
 @public
 @constant
 def isOperatorFor(_operator: address, _holder: address) -> bool:
-    return (self.operators[_holder])[_operator] or self.defaultOperatorsMap[_operator] or _operator == msg.sender
+    return (self.operators[_holder])[_operator] or self.defaultOperatorsMap[_operator] or _operator == _holder
 
 
 @public
