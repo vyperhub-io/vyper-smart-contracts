@@ -106,7 +106,7 @@ contract('ERC777', async accounts => {
   });
 
   it('...holder should send tokens.', async () => {
-    const amount = 100
+    const amount = 100;
     await erc777Token.mint(holder, amount, { from: defaultOperator });
 
     const   holder_balance_before = await erc777Token.balanceOf.call(holder);
@@ -130,7 +130,7 @@ contract('ERC777', async accounts => {
   });
 
   it('...holder should not send tokens to ZERO_ADDRESS.', async () => {
-    const amount = 100
+    const amount = 100;
     await erc777Token.mint(holder, amount, { from: defaultOperator });
 
     try {
@@ -258,7 +258,7 @@ contract('ERC777', async accounts => {
   });
 
   it('...holder should not operatorSend tokens to ZERO_ADDRESS.', async () => {
-    const amount = 100
+    const amount = 100;
     await erc777Token.mint(holder, amount, { from: defaultOperator });
 
     try {
@@ -275,7 +275,7 @@ contract('ERC777', async accounts => {
   });
 
   it('...defaultOperator should not operatorSend tokens to ZERO_ADDRESS.', async () => {
-    const amount = 100
+    const amount = 100;
     await erc777Token.mint(holder, amount, { from: defaultOperator });
 
     try {
@@ -469,8 +469,7 @@ contract('ERC777', async accounts => {
   });
 
   it('...defaultOperator should not mint with wrong granularity.', async () => {
-    const amount = 200
-    const wrongAmount = 101
+    const wrongAmount = 101;
 
     try {
       await erc777Token.mint(holder, wrongAmount, { from: defaultOperator });
@@ -486,8 +485,8 @@ contract('ERC777', async accounts => {
   });
 
   it('...holder should not send with wrong granularity.', async () => {
-    const amount = 200
-    const wrongAmount = 101
+    const amount = 200;
+    const wrongAmount = 101;
     await erc777Token.mint(holder, amount, { from: defaultOperator });
 
     try {
@@ -504,8 +503,8 @@ contract('ERC777', async accounts => {
   });
 
   it('...holder should not operatorSend with wrong granularity.', async () => {
-    const amount = 200
-    const wrongAmount = 101
+    const amount = 200;
+    const wrongAmount = 101;
     await erc777Token.mint(holder, amount, { from: defaultOperator });
 
     try {
@@ -522,8 +521,8 @@ contract('ERC777', async accounts => {
   });
 
   it('...approved operator should not operatorSend with wrong granularity.', async () => {
-    const amount = 200
-    const wrongAmount = 101
+    const amount = 200;
+    const wrongAmount = 101;
     await erc777Token.mint(holder, amount, { from: defaultOperator });
     await erc777Token.authorizeOperator(operator, { from: holder })
 
@@ -541,8 +540,8 @@ contract('ERC777', async accounts => {
   });
 
   it('...defaultOperator should not operatorSend with wrong granularity.', async () => {
-    const amount = 200
-    const wrongAmount = 101
+    const amount = 200;
+    const wrongAmount = 101;
     await erc777Token.mint(holder, amount, { from: defaultOperator });
 
     try {
@@ -559,8 +558,8 @@ contract('ERC777', async accounts => {
   });
 
   it('...holder should not burn with wrong granularity.', async () => {
-    const amount = 200
-    const wrongAmount = 101
+    const amount = 200;
+    const wrongAmount = 101;
     await erc777Token.mint(holder, amount, { from: defaultOperator });
 
     try {
@@ -577,10 +576,10 @@ contract('ERC777', async accounts => {
   });
 
   it('...approved operator should not operatorBurn with wrong granularity.', async () => {
-    const amount = 200
-    const wrongAmount = 101
+    const amount = 200;
+    const wrongAmount = 101;
     await erc777Token.mint(holder, amount, { from: defaultOperator });
-    await erc777Token.authorizeOperator(operator, { from: holder })
+    await erc777Token.authorizeOperator(operator, { from: holder });
 
     try {
       await erc777Token.operatorBurn(holder, wrongAmount, { from: operator });
@@ -596,8 +595,8 @@ contract('ERC777', async accounts => {
   });
 
   it('...defaultOperator should not burn with wrong granularity.', async () => {
-    const amount = 200
-    const wrongAmount = 101
+    const amount = 200;
+    const wrongAmount = 101;
     await erc777Token.mint(holder, amount, { from: defaultOperator });
 
     try {
@@ -631,11 +630,28 @@ contract('ERC777', async accounts => {
   it('...should call `tokensReceived` hook.', async () => {
 
   });
+  */
 
   it('...should not deploy with granularity of 0.', async () => {
+    try {
+      await erc777.new(
+        args.name,
+        args.symbol,
+        args.totalSupply,
+        0,
+        args.defaultOperators,
+        { from: defaultOperator }
+      );
+    } catch (e) {
+      revert = e;
+    }
 
+    assert.instanceOf(
+      revert,
+      Error,
+      'Deploy with granularity of 0 did not revert.'
+    );
   });
-  */
 
   // TODO: Test event logging
   // TODO: Test send/operatorSend/mint/burn with negative values
