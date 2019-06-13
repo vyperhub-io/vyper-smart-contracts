@@ -11,4 +11,9 @@ If the functions exist, then the code inside of both functions is executed.
 The exiting thing is, that there are no restrictions on what the code inside of the two functions looks like or what it does.
 
 ## Tests
-Tests for this implementation can be found [here](https://github.com/0xjac/ERC777/tree/master/test).
+### Run local tests
+```bash
+$ truffle test --network ganache
+```
+### More tests
+Further tests for this implementation can be found [here](https://github.com/0xjac/ERC777/tree/master/test).
