@@ -104,6 +104,8 @@ def __init__(
     self.name = _name
     self.symbol = _symbol
     self.totalSupply = _totalSupply
+    # The granularity value MUST be greater than or equal to 1
+    assert _granularity >= 1
     self.granularity = _granularity
     self.defaultOperatorsList = _defaultOperators
     for i in range(4):
