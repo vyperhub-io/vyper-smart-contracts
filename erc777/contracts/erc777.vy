@@ -95,8 +95,8 @@ operators: map(address, map(address, bool))
 
 @public
 def __init__(
-    _name: string[32],
-    _symbol: string[16],
+    _name: string[64],
+    _symbol: string[32],
     _totalSupply: uint256,
     _granularity: uint256,
     _defaultOperators: address[4]
