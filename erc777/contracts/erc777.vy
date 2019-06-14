@@ -116,7 +116,6 @@ def __init__(
 
 
 @private
-@constant
 def _checkForERC777TokensInterface_Sender(
     _operator: address,
     _from: address,
@@ -131,7 +130,6 @@ def _checkForERC777TokensInterface_Sender(
 
 
 @private
-@constant
 def _checkForERC777TokensInterface_Recipient(
     _operator: address,
     _from: address,
