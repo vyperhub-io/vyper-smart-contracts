@@ -102,32 +102,35 @@ def __init__():
     self.erc1820Registry.setInterfaceImplementer(self, keccak256("ERC777TokensSender"), self)
 
 
-# ETH
+# ----- ETH -----
 @public
 @payable
 def __default__():
     log.ETHReceived(msg.sender, msg.value)
-
 
 @public
 def sendETH(
     _to: address,
     _amount: uint256
   ):
+    assert msg.sender == self.owner
     send(_to, _amount)
     log.ETHSent(_to, _amount)
 
 
+# ----- ERC20 -----
 @public
 def sendERC20(
     _token: address,
     _to: address,
     _amount: uint256
   ):
+    assert msg.sender == self.owner
     ERC20Token(_token).transfer(_to, _amount)
     log.ERC20Sent(_token, _to, _amount)
 
 
+# ----- ERC721 -----
 @public
 def sendERC721(
     _token: address,
@@ -135,11 +138,10 @@ def sendERC721(
     _tokenId: uint256,
     _data: bytes[256]=""
   ):
+    assert msg.sender == self.owner
     ERC721Token(_token).safeTransferFrom(self, _to, _tokenId, _data)
     log.ERC721Sent(_token, self, _to, _tokenId, _data)
 
-
-# ERC721
 @public
 def onERC721Received(
     _token: address,
@@ -152,6 +154,7 @@ def onERC721Received(
     return keccak256("onERC721Received(address,address,uint256,bytes)")
 
 
+# ----- ERC777 -----
 @public
 def sendERC777(
     _token: address,
@@ -159,21 +162,8 @@ def sendERC777(
     _amount: uint256,
     _data: bytes[256]=""
   ):
+    assert msg.sender == self.owner
     ERC777Token(_token).send(_to, _amount, _data)
-
-
-# ERC777 Hooks
-@public
-def tokensReceived(
-    _operator: address,
-    _from: address,
-    _to: address,
-    _amount: uint256,
-    _data: bytes[256],
-    _operatorData: bytes[256]
-  ):
-    log.ERC777Received(_operator, _from, _to, _amount, _data, _operatorData)
-
 
 @public
 def tokensToSend(
@@ -185,3 +175,14 @@ def tokensToSend(
     _operatorData: bytes[256]
   ):
     log.ERC777Sent(_operator, _from, _to, _amount, _data, _operatorData)
+
+@public
+def tokensReceived(
+    _operator: address,
+    _from: address,
+    _to: address,
+    _amount: uint256,
+    _data: bytes[256],
+    _operatorData: bytes[256]
+  ):
+    log.ERC777Received(_operator, _from, _to, _amount, _data, _operatorData)
