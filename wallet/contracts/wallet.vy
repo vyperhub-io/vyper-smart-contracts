@@ -8,13 +8,11 @@ contract ERC1820Registry:
         _implementer: address
     ): modifying
 
-
 contract ERC20Token:
     def transfer(
         _to: address,
         _value: uint256
     ) -> bool: modifying
-
 
 contract ERC721Token:
     def safeTransferFrom(
@@ -44,9 +42,8 @@ ETHSent: event({
 })
 
 # TODO:
-ERC20Received: event({
-
-})
+#ERC20Received: event({
+#})
 
 ERC20Sent: event({
     _token: address,
@@ -128,6 +125,9 @@ def sendERC20(
     assert msg.sender == self.owner
     ERC20Token(_token).transfer(_to, _amount)
     log.ERC20Sent(_token, _to, _amount)
+
+#@public
+#def onERC20Received():
 
 
 # ----- ERC721 -----
