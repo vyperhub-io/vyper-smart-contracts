@@ -169,12 +169,10 @@ def tokensReceived(
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256]="",
-    _operatorData: bytes[256]=""
+    _data: bytes[256],
+    _operatorData: bytes[256]
   ):
-    # TODO: This is not working
-    #log.ERC777Received(_operator, _from, _to, _amount, _data, _operatorData)
-    assert True
+    log.ERC777Received(_operator, _from, _to, _amount, _data, _operatorData)
 
 
 @public
@@ -183,9 +181,7 @@ def tokensToSend(
     _from: address,
     _to: address,
     _amount: uint256,
-    _data: bytes[256]="",
-    _operatorData: bytes[256]=""
+    _data: bytes[256],
+    _operatorData: bytes[256]
   ):
-    # TODO: This is not working
-    #log.ERC777Sent(_operator, _from, _to, _amount, _data, _operatorData)
-    assert True
+    log.ERC777Sent(_operator, _from, _to, _amount, _data, _operatorData)
