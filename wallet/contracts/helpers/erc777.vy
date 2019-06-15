@@ -1,21 +1,9 @@
 # Author: Sören Steiger, github.com/ssteiger
 # License: MIT
 
-
-# ATTENTION!!
-# NOTE: There is an error with vyper when using bytes[256]=""
-#       as default parameter in @private functions
-#       see: https://github.com/ethereum/vyper/issues/1463
-#
-# TODO: change:
-#       `_checkForERC777TokensInterface_Sender`
-#       `_checkForERC777TokensInterface_Recipient`
-#       `_transferFunds`
-#        from @public back to @private
-
-
 # ERC777 Token Standard
 # https://eips.ethereum.org/EIPS/eip-777
+
 
 # Interface for ERC1820 registry contract
 # https://eips.ethereum.org/EIPS/eip-1820
@@ -107,8 +95,8 @@ operators: map(address, map(address, bool))
 
 @public
 def __init__(
-    _name: string[32],
-    _symbol: string[16],
+    _name: string[64],
+    _symbol: string[32],
     _totalSupply: uint256,
     _granularity: uint256,
     _defaultOperators: address[4]
@@ -116,6 +104,8 @@ def __init__(
     self.name = _name
     self.symbol = _symbol
     self.totalSupply = _totalSupply
+    # The granularity value MUST be greater than or equal to 1
+    assert _granularity >= 1
     self.granularity = _granularity
     self.defaultOperatorsList = _defaultOperators
     for i in range(4):
@@ -125,10 +115,7 @@ def __init__(
     self.erc1820Registry.setInterfaceImplementer(self, keccak256("ERC777Token"), self)
 
 
-# TODO: change this back to @private!
-#       see: https://github.com/ethereum/vyper/issues/1463
-@public
-@constant
+@private
 def _checkForERC777TokensInterface_Sender(
     _operator: address,
     _from: address,
@@ -142,10 +129,7 @@ def _checkForERC777TokensInterface_Sender(
         ERC777TokensSender(_from).tokensToSend(_operator, _from, _to, _amount, _data, _operatorData)
 
 
-# TODO: change this back to @private!
-#       see: https://github.com/ethereum/vyper/issues/1463
-@public
-@constant
+@private
 def _checkForERC777TokensInterface_Recipient(
     _operator: address,
     _from: address,
@@ -159,9 +143,7 @@ def _checkForERC777TokensInterface_Recipient(
         ERC777TokensRecipient(_to).tokensReceived(_operator, _from, _to, _amount, _data, _operatorData)
 
 
-# TODO: change this back to @private!
-#       see: https://github.com/ethereum/vyper/issues/1463
-@public
+@private
 def _transferFunds(
     _operator: address,
     _from: address,
@@ -175,9 +157,7 @@ def _transferFunds(
 
     # check for 'tokensToSend' hook
     if _from.is_contract:
-        implementer: address = self.erc1820Registry.getInterfaceImplementer(_from, keccak256("ERC777TokensSender"))
-        if implementer != ZERO_ADDRESS:
-            ERC777TokensSender(_from).tokensToSend(_operator, _from, _to, _amount, _data, _operatorData)
+        self._checkForERC777TokensInterface_Sender(_operator, _from, _to, _amount, _data, _operatorData)
 
     self.balanceOf[_from] -= _amount
     self.balanceOf[_to] += _amount
@@ -198,7 +178,7 @@ def defaultOperators() -> address[4]:
 @public
 @constant
 def isOperatorFor(_operator: address, _holder: address) -> bool:
-    return (self.operators[_holder])[_operator] or self.defaultOperatorsMap[_operator] or _operator == msg.sender
+    return (self.operators[_holder])[_operator] or self.defaultOperatorsMap[_operator] or _operator == _holder
 
 
 @public
