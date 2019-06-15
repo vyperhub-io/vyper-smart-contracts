@@ -22,7 +22,6 @@ contract ERC721Token:
         _data: bytes[256]
     ): modifying
 
-
 contract ERC777Token:
     def send(
         _to: address,
