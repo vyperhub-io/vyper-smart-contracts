@@ -1,5 +1,7 @@
-const erc777 = artifacts.require('erc777');
-const erc1820Registry = artifacts.require('ERC1820Registry');
+const              erc777 = artifacts.require('erc777');
+const erc777TokenReceiver = artifacts.require('erc777TokenReceiver');
+const   erc777TokenSender = artifacts.require('erc777TokenSender');
+const     erc1820Registry = artifacts.require('ERC1820Registry');
 
 const truffleFromAddress = '0x954e72fdc51Cf919203067406fB337Ed4bDC8CdA';
 
@@ -355,7 +357,6 @@ contract('ERC777', async accounts => {
   it('...defaultOperator should do operatorBurn.', async () => {
     const amount = 100;
     await erc777Token.mint(holder, amount, { from: defaultOperator });
-    await erc777Token.authorizeOperator(operator, { from: holder })
 
     const holder_balance_before = await erc777Token.balanceOf.call(holder);
     const totalSupply_before = await erc777Token.totalSupply.call();
@@ -623,11 +624,37 @@ contract('ERC777', async accounts => {
   */
 
   /*
-  it('...should call `tokensToSend` hook.', async () => {
-
-  });
-
   it('...should call `tokensReceived` hook.', async () => {
+    const erc777Receiver = await erc777TokenReceiver.new({ from: receiver });
+
+    const amount = 200;
+    await erc777Token.mint(holder, amount, { from: defaultOperator });
+
+    const   holder_balance_before = await erc777Token.balanceOf.call(holder);
+    const receiver_balance_before = await erc777Token.balanceOf.call(erc777Receiver.address);
+
+    const result1 = await erc777Token.send(erc777Receiver.address, amount, { from: holder });
+    console.log(result1)
+    const result2 = await erc777Receiver.tokensReceived(holder, holder, erc777Receiver.address, amount, null, null)
+    console.log(result2)
+
+    const   holder_balance_after = await erc777Token.balanceOf.call(holder);
+    const receiver_balance_after = await erc777Token.balanceOf.call(erc777Receiver.address);
+
+    assert.equal(
+      holder_balance_before - amount,
+      holder_balance_after.toString(),
+      'Holder balance was not correctly updated.'
+    );
+    assert.equal(
+      receiver_balance_before.toString(),
+      receiver_balance_after - amount,
+      'Receiver balance was not correctly updated.'
+    );
+  });
+  */
+  /* TODO
+  it('...should call `tokensToSend` hook.', async () => {
 
   });
   */
@@ -653,7 +680,144 @@ contract('ERC777', async accounts => {
     );
   });
 
-  // TODO: Test event logging
+  // Test event logging
+  it('...should log Minted on mint().', async () => {
+    /*
+    _operator: indexed(address), # Address which triggered the mint.
+    _to: indexed(address),       # Recipient of the tokens.
+    _amount: uint256,            # Number of tokens minted.
+    _data: bytes[256],           # Information provided for the recipient.
+    _operatorData: bytes[256]    # Information provided by the operator.
+    */
+    const amount = 100;
+    const res = await erc777Token.mint(holder, amount, { from: defaultOperator });
+    const log = res.logs.find(element => element.event.match('Mint'));
+
+    assert.strictEqual(log.args._operator, defaultOperator);
+    assert.strictEqual(log.args._to, holder);
+    assert.equal(log.args._amount.toString(), amount);
+    assert.strictEqual(log.args._data, null);
+    assert.strictEqual(log.args._operatorData, null);
+  })
+
+  it('...should log Sent on send().', async () => {
+    /*
+    _operator: indexed(address), # Address which triggered the send.
+    _from: indexed(address),     # Token holder.
+    _to: indexed(address),       # Token recipient.
+    _amount: uint256,            # Number of tokens to send.
+    _data: bytes[256],           # Information provided by the token holder.
+    _operatorData: bytes[256]    # Information provided by the operator.
+     */
+    const amount = 100;
+    await erc777Token.mint(holder, amount, { from: defaultOperator });
+
+    const res = await erc777Token.send(receiver, amount, { from: holder });
+    const log = res.logs.find(element => element.event.match('Sent'));
+
+    assert.strictEqual(log.args._operator, holder);
+    assert.strictEqual(log.args._from, holder);
+    assert.strictEqual(log.args._to, receiver);
+    assert.equal(log.args._amount.toString(), amount);
+    assert.strictEqual(log.args._data, null);
+    assert.strictEqual(log.args._operatorData, null);
+  })
+
+  it('...should log Sent on operatorSend().', async () => {
+    /*
+    _operator: indexed(address), # Address which triggered the send.
+    _from: indexed(address),     # Token holder.
+    _to: indexed(address),       # Token recipient.
+    _amount: uint256,            # Number of tokens to send.
+    _data: bytes[256],           # Information provided by the token holder.
+    _operatorData: bytes[256]    # Information provided by the operator.
+     */
+    const amount = 100;
+    await erc777Token.mint(holder, amount, { from: defaultOperator });
+
+    const res = await erc777Token.operatorSend(holder, receiver, amount, { from: holder });
+    const log = res.logs.find(element => element.event.match('Sent'));
+
+    assert.strictEqual(log.args._operator, holder);
+    assert.strictEqual(log.args._from, holder);
+    assert.strictEqual(log.args._to, receiver);
+    assert.equal(log.args._amount.toString(), amount);
+    assert.strictEqual(log.args._data, null);
+    assert.strictEqual(log.args._operatorData, null);
+  })
+
+  it('...should log Burned on burn().', async () => {
+    /*
+    _operator: indexed(address), # Address which triggered the burn.
+    _from: indexed(address),     # Token holder whose tokens are burned.
+    _amount: uint256,            # Token holder whose tokens are burned.
+    _data: bytes[256],           # Information provided by the token holder.
+    _operatorData: bytes[256]    # Information provided by the operator.
+    */
+    const amount = 100;
+    await erc777Token.mint(holder, amount, { from: defaultOperator });
+
+    const res = await erc777Token.burn(amount, { from: holder });
+    const log = res.logs.find(element => element.event.match('Burned'));
+
+    assert.strictEqual(log.args._operator, holder);
+    assert.strictEqual(log.args._from, holder);
+    assert.equal(log.args._amount.toString(), amount);
+    assert.strictEqual(log.args._data, null);
+    assert.strictEqual(log.args._operatorData, null);
+  })
+
+  it('...should log Burned on operatorBurn().', async () => {
+    /*
+    _operator: indexed(address), # Address which triggered the burn.
+    _from: indexed(address),     # Token holder whose tokens are burned.
+    _amount: uint256,            # Token holder whose tokens are burned.
+    _data: bytes[256],           # Information provided by the token holder.
+    _operatorData: bytes[256]    # Information provided by the operator.
+    */
+    const amount = 100;
+    await erc777Token.mint(holder, amount, { from: defaultOperator });
+    await erc777Token.authorizeOperator(operator, { from: holder })
+
+    const res = await erc777Token.operatorBurn(holder, amount, { from: operator });
+    const log = res.logs.find(element => element.event.match('Burned'));
+
+    assert.strictEqual(log.args._operator, operator);
+    assert.strictEqual(log.args._from, holder);
+    assert.equal(log.args._amount.toString(), amount);
+    assert.strictEqual(log.args._data, null);
+    assert.strictEqual(log.args._operatorData, null);
+  })
+
+  it('...should log AuthorizedOperator on authorizeOperator().', async () => {
+    /*
+    _operator: indexed(address), # Address which became an operator of tokenHolder.
+    _holder: indexed(address)    # Address of a token holder which authorized the operator address as an operator.
+    */
+    const newOperator = accounts[2];
+
+    const res = await erc777Token.authorizeOperator(newOperator, { from: holder });
+    const log = res.logs.find(element => element.event.match('AuthorizedOperator'));
+
+    assert.strictEqual(log.args._operator, newOperator);
+    assert.strictEqual(log.args._holder, holder);
+  })
+
+  it('...should log RevokedOperator on revokeOperator().', async () => {
+    /*
+    _operator: indexed(address), # Address which was revoked as an operator of tokenHolder.
+    _holder: indexed(address)    # Address of a token holder which revoked the operator address as an operator.
+    */
+    await erc777Token.authorizeOperator(operator, { from: holder });
+
+    const res = await erc777Token.revokeOperator(operator, { from: holder });
+    const log = res.logs.find(element => element.event.match('RevokedOperator'));
+
+    assert.strictEqual(log.args._operator, operator);
+    assert.strictEqual(log.args._holder, holder);
+  })
+
+  // TODO: Test use of data and opeator data in all variations (send, transfer, events, etc.)
   // TODO: Test send/operatorSend/mint/burn with negative values
   // TODO: Test send/operatorSend/mint/burn with zero values
   // TODO: Test send/operatorSend/mint/burn with using default parameters
