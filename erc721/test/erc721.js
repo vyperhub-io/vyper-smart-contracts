@@ -1,8 +1,3 @@
-/*
-  NOTE:
-        myMethod.call - Will call a “constant” method, can not alter the smart contract state.
-
-*/
 const erc721 = artifacts.require("erc721");
 
 contract("ERC721", async accounts => {
