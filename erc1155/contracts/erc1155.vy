@@ -258,7 +258,6 @@ def mintBatch(
     _data: bytes[256]=""
   ) -> uint256[BATCH_SIZE]:
     assert _to != ZERO_ADDRESS
-    #assert len(_ids) == len(_supplys)
     ids: uint256[BATCH_SIZE]
     for i in range(BATCH_SIZE):
         self._balanceOf[msg.sender][self.tokensIdCount] = _supplys[i]
