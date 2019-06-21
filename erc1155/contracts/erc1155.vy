@@ -64,16 +64,6 @@ ApprovalForAll: event({
     _approved: bool
 })
 
-# @dev MUST emit when the URI is updated for a token ID.
-#      URIs are defined in RFC 3986.
-#      The URI MUST point to a JSON file that conforms to the "ERC-1155 Metadata URI JSON Schema".
-# event URI(string _value, uint256 indexed _id);
-URI: event({
-    # https://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url-in-different-browsers
-    _value: string[1024], # TODO: decide which string array size to use
-    _id: indexed(uint256)
-})
-
 
 
 supportedInterfaces: map(bytes32, bool)
@@ -236,7 +226,7 @@ def isApprovedForAll(
 
 
 # NOTE: This is not part of the standard
-# TODO:: Right now everyone can mint
+# TODO: Right now everyone can mint
 @public
 def mint(
     _to: address,
