@@ -172,7 +172,6 @@ def safeBatchTransferFrom(
         if _to.is_contract:
             returnValue: bytes32 = ERC1155TokenReceiver(_to).onERC1155Received(msg.sender, _from, _ids[i], _values[i], _data)
             assert returnValue == method_id("onERC1155Received(address,address,uint256,uint256,bytes)", bytes32)
-        log.TransferSingle(msg.sender, _from, _to, _ids[i], _values[i])
 
     log.TransferBatch(msg.sender, _from, _to, _ids, _values)
 
@@ -266,7 +265,6 @@ def mintBatch(
         self.tokensIdCount += 1
         id: uint256 = self.tokensIdCount
         ids[i] = id
-        log.TransferSingle(msg.sender, ZERO_ADDRESS, _to, id, _supplys[i])
 
     log.TransferBatch(msg.sender, ZERO_ADDRESS, _to, ids, _supplys)
     return ids
