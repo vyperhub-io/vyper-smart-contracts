@@ -64,30 +64,44 @@ ApprovalForAll: event({
     _approved: bool
 })
 
+# @dev MUST emit when the URI is updated for a token ID.
+#      URIs are defined in RFC 3986.
+#      The URI MUST point to a JSON file that conforms to the "ERC-1155 Metadata URI JSON Schema".
+# event URI(string _value, uint256 indexed _id);
+URI: event({
+    # https://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url-in-different-browsers
+    _value: string[MAX_URI_SIZE],
+    _id: indexed(uint256)
+})
 
 
-supportedInterfaces: map(bytes32, bool)
+# TODO: decide which batch size to use
+BATCH_SIZE: constant(uint256) = 5
+MAX_URI_SIZE: constant(uint256) = 1024
 
 # https://eips.ethereum.org/EIPS/eip-165
-ERC165_INTERFACE_ID: constant(bytes32)  = 0x0000000000000000000000000000000000000000000000000000000001ffc9a7
-ERC1155_INTERFACE_ID: constant(bytes32) = 0x00000000000000000000000000000000000000000000000000000000d9b67a26
+INTERFACE_ID_ERC165: constant(bytes32)  = 0x0000000000000000000000000000000000000000000000000000000001ffc9a7
+INTERFACE_ID_ERC1155: constant(bytes32) = 0x00000000000000000000000000000000000000000000000000000000d9b67a26
+INTERFACE_ID_ERC1155_METADATA: constant(bytes32) = 0x000000000000000000000000000000000000000000000000000000000e89341c
+
+supportedInterfaces: map(bytes32, bool)
 
 tokensIdCount: uint256
 
 _balanceOf: map(address, map(uint256, uint256))
 
-operators: map(address, map(address, bool))
+_uri: map(uint256, string[MAX_URI_SIZE])
 
-# TODO: decide which batch size to use
-BATCH_SIZE: constant(uint256) = 5
+operators: map(address, map(address, bool))
 
 
 
 @public
 def __init__():
     self.tokensIdCount = 0
-    self.supportedInterfaces[ERC165_INTERFACE_ID] = True
-    self.supportedInterfaces[ERC1155_INTERFACE_ID] = True
+    self.supportedInterfaces[INTERFACE_ID_ERC165] = True
+    self.supportedInterfaces[INTERFACE_ID_ERC1155] = True
+    self.supportedInterfaces[INTERFACE_ID_ERC1155_METADATA] = True
 
 
 @public
@@ -179,6 +193,26 @@ def balanceOf(
   ) -> uint256:
     assert _owner != ZERO_ADDRESS
     return self._balanceOf[_owner][_id]
+
+
+# NOTE: This is not part of the standard
+# TODO: Right now everyone can set/change an uri
+# https://www.ietf.org/rfc/rfc3986.txt
+@public
+def setUri(_id: uint256, _newUri: string[MAX_URI_SIZE]):
+    self._uri[_id] = _newUri
+    log.URI(_newUri, _id)
+
+
+# @notice A distinct Uniform Resource Identifier (URI) for a given token.
+# @dev    URIs are defined in RFC 3986. (https://www.ietf.org/rfc/rfc3986.txt)
+#         The URI MUST point to a JSON file that conforms to the "ERC-1155 Metadata URI JSON Schema".
+# @return URI string
+# function uri(uint256 _id) external view returns (string memory);
+@public
+@constant
+def uri(_id: uint256) -> string[MAX_URI_SIZE]:
+    return self._uri[_id]
 
 
 # @notice Get the balance of multiple account/token pairs
