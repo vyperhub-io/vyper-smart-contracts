@@ -209,6 +209,7 @@ def setApprovalForAll(
     _approved: bool
   ):
     (self.operators[msg.sender])[_operator] = _approved
+    log.ApprovalForAll(msg.sender, _operator, _approved)
 
 
 # @notice Queries the approval status of an operator for a given owner.
