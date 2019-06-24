@@ -236,6 +236,7 @@ def mint(
     _supply: uint256,
     _data: bytes[256]=""
   ) -> uint256:
+    assert _to != ZERO_ADDRESS
     self._balanceOf[msg.sender][self.tokensIdCount] = _supply
     self.tokensIdCount += 1
     log.TransferSingle(msg.sender, ZERO_ADDRESS, _to, self.tokensIdCount, _supply)
