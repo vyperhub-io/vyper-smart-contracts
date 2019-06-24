@@ -117,6 +117,7 @@ def safeTransferFrom(
     _value: uint256,
     _data: bytes[256]
   ):
+    assert _from == msg.sender or (self.operators[_from])[msg.sender]
     assert _to != ZERO_ADDRESS
     assert self._balanceOf[_from][_id] >= _value
 
@@ -152,6 +153,7 @@ def safeBatchTransferFrom(
     _values: uint256[BATCH_SIZE],
     _data: bytes[256]
   ):
+    assert _from == msg.sender or (self.operators[_from])[msg.sender]
     assert _to != ZERO_ADDRESS
     #assert len(_ids) == len(_values)
 
