@@ -1,9 +1,8 @@
 # ERC777
-https://eips.ethereum.org/EIPS/eip-777
 
-The ERC777 Token Standard improves on the popular [ERC20](https://contracts.vyperhub.io/contracts/erc20) standard.
+The [ERC777 Token Standard](https://eips.ethereum.org/EIPS/eip-777) improves on the popular [ERC20](https://contracts.vyperhub.io/contracts/erc20) standard.
 
-It's most defining feature is the use of the new [ERC1820](http://eips.ethereum.org/EIPS/eip-1820) interface standard which it uses in such a way, that each time a token is sent two things happen: 
+It's most defining feature is the use of the new [ERC1820](http://eips.ethereum.org/EIPS/eip-1820) interface standard which it uses in such a way, that each time tokens are sent two things happen: 
 1. The ERC777 contract It checks wether the sender of the transaction is a contract and wether that contract implements a tokensToSend(_operator, _from, _to, _amount, _data, _operatorData) function.
 2. It checks wether the receiver of the transaction is a contract and wether that contract implements a tokensToSend(_operator, _from, _to, _amount, _data, _operatorData) function.
 
