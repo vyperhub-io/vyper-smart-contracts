@@ -181,7 +181,7 @@ contract('ERC777', async accounts => {
     );
     assert.isNotOk(
       operator_status_after,
-      'Operator rights were not orrectly revoked.'
+      'Operator rights were not correctly revoked.'
     );
   });
 
