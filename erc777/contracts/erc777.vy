@@ -82,11 +82,11 @@ erc1820RegistryAddress: constant(address) = 0x1820a4B7618BdE71Dce8cdc73aAB6C9590
 
 # TODO: decide which size to use
 NO_OF_DEFAULT_OPERATORS: constant(uint256) = 5
-MAX_NAME_LENGTH: constant(uint256) = 64
-MAX_SYMBOL_LENGTH: constant(uint256) = 32
+MAX_LENGTH_NAME: constant(uint256) = 64
+MAX_LENGTH_SYMBOL: constant(uint256) = 32
 
-name: public(string[MAX_NAME_LENGTH])
-symbol: public(string[MAX_SYMBOL_LENGTH])
+name: public(string[MAX_LENGTH_NAME])
+symbol: public(string[MAX_LENGTH_SYMBOL])
 
 totalSupply: public(uint256)
 granularity: public(uint256)
@@ -101,8 +101,8 @@ operators: map(address, map(address, bool))
 
 @public
 def __init__(
-    _name: string[MAX_NAME_LENGTH],
-    _symbol: string[MAX_SYMBOL_LENGTH],
+    _name: string[MAX_LENGTH_NAME],
+    _symbol: string[MAX_LENGTH_SYMBOL],
     _totalSupply: uint256,
     _granularity: uint256,
     _defaultOperators: address[NO_OF_DEFAULT_OPERATORS]
