@@ -229,7 +229,7 @@ def isApprovedForAll(
 
 
 # NOTE: This is not part of the standard
-# TODO: Right now everyone can mint
+# TODO: Right now anyone can mint
 @public
 def mint(
     _to: address,
@@ -244,7 +244,7 @@ def mint(
 
 
 # NOTE: This is not part of the standard
-# TODO: Right now everyone can mint
+# TODO: Right now anyone can mint
 @public
 def mintBatch(
     _to: address,
