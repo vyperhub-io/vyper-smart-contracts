@@ -17,14 +17,14 @@ contract("ERC721", async accounts => {
     erc721Token = await erc721.new({ from: owner });
   });
 
-  it("...should set erc165 interface.", async () => {
+  it("...should register ERC165 interface.", async () => {
     const has_erc165_interface = await erc721Token.supportsInterface.call(ERC165_INTERFACE_ID);
-    assert.ok(has_erc165_interface, "The erc165 interface was not correctly set.");
+    assert.ok(has_erc165_interface, "The ERC165 interface was not correctly registered.");
   });
 
-  it("...should set erc721 interface.", async () => {
+  it("...should register ERC721 interface.", async () => {
     const has_erc721_interface = await erc721Token.supportsInterface.call(ERC721_INTERFACE_ID);
-    assert.ok(has_erc721_interface, "The erc721 interface was not correctly set.");
+    assert.ok(has_erc721_interface, "The ERC721 interface was not correctly registered.");
   });
 
   it("...should mint token to owner.", async () => {
