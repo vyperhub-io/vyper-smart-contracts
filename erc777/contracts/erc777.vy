@@ -80,14 +80,20 @@ RevokedOperator: event({
 erc1820Registry: ERC1820Registry
 erc1820RegistryAddress: constant(address) = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
 
-name: public(string[64])
-symbol: public(string[32])
+# TODO: decide which size to use
+NO_OF_DEFAULT_OPERATORS: constant(uint256) = 5
+MAX_NAME_LENGTH: constant(uint256) = 64
+MAX_SYMBOL_LENGTH: constant(uint256) = 32
+
+name: public(string[MAX_NAME_LENGTH])
+symbol: public(string[MAX_SYMBOL_LENGTH])
+
 totalSupply: public(uint256)
 granularity: public(uint256)
 
 balanceOf: public(map(address, uint256))
 
-defaultOperatorsList: address[4]
+defaultOperatorsList: address[NO_OF_DEFAULT_OPERATORS]
 defaultOperatorsMap: map(address, bool)
 
 operators: map(address, map(address, bool))
@@ -95,11 +101,11 @@ operators: map(address, map(address, bool))
 
 @public
 def __init__(
-    _name: string[64],
-    _symbol: string[32],
+    _name: string[MAX_NAME_LENGTH],
+    _symbol: string[MAX_SYMBOL_LENGTH],
     _totalSupply: uint256,
     _granularity: uint256,
-    _defaultOperators: address[4]
+    _defaultOperators: address[NO_OF_DEFAULT_OPERATORS]
   ):
     self.name = _name
     self.symbol = _symbol
@@ -108,7 +114,7 @@ def __init__(
     assert _granularity >= 1
     self.granularity = _granularity
     self.defaultOperatorsList = _defaultOperators
-    for i in range(4):
+    for i in range(NO_OF_DEFAULT_OPERATORS):
         assert _defaultOperators[i] != ZERO_ADDRESS
         self.defaultOperatorsMap[_defaultOperators[i]] = True
     self.erc1820Registry = ERC1820Registry(erc1820RegistryAddress)
@@ -171,7 +177,7 @@ def _transferFunds(
 
 @public
 @constant
-def defaultOperators() -> address[4]:
+def defaultOperators() -> address[NO_OF_DEFAULT_OPERATORS]:
     return self.defaultOperatorsList
 
 
